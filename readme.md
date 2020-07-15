@@ -10,6 +10,9 @@
 - [Installation and Usage](#Installation-and-Usage)
 - [Example](#Example)
 - [API](#API)
+  <details>
+    <summary>Click to expand</summary>
+
   - [SuperExpressive()](#SuperExpressive())
   - [.allowMultipleMatches](#allowMultipleMatches)
   - [.lineByLine](#lineByLine)
@@ -55,6 +58,8 @@
   - [.range(a, b)](#range(a,-b))
   - [.toRegexString()](#toRegexString())
   - [.toRegex()](#toRegex())
+  </details>
+
 ## Why?
 
 Regex is a very powerful tool, but its terse and cryptic vocabulary can make constructing and communicating them with others a challenge. Even developers who understand them well can have trouble reading their own back just a few months later! In addition, they can't be easily created and manipulated in a programmatic way - closing off an entire avenue of dynamic text processing.
@@ -64,6 +69,8 @@ That's where **Super Expressive** comes in. It provides a programmatic and human
 - properties and methods describe what they do in plain English
 - order matters! quantifiers are specified before the thing they change, just like in English (e.g. `SuperExpressive().exactly(5).digit`)
 - if you make a mistake, you'll know how to fix it. SuperExpressive will guide you towards a fix if your expression is invalid
+
+SuperExpressive turns those complex and unweildy regexes that appear in code reviews into something that can be read, understood, and **properly reviewed** by your peers - and maintained by anyone!
 
 ## Installation and Usage
 
@@ -617,7 +624,7 @@ Matches any of the characters in the provided string `chars`.
 **Example**
 ```JavaScript
 SuperExpressive()
-  .anyOfString('aeiou')
+  .anyOfChars('aeiou')
   .toRegex();
 // ->
 /[aeiou]/
