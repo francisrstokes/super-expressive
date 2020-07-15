@@ -4,12 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha index.test.js"
+    "test": "mocha index.test.js",
+    "test:coverage": "nyc --reporter=text-summary mocha index.test.js"
   },
   "author": "Francis Stokes <stokesie14@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^8.0.1"
+    "mocha": "^8.0.1",
+    "nyc": "^15.1.0"
   }
 }
