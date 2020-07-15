@@ -11,50 +11,50 @@
 - [Example](#Example)
 - [API](#API)
   - [SuperExpressive()](#SuperExpressive())
-  - [.allowMultipleMatches](#.allowMultipleMatches)
-  - [.lineByLine](#.lineByLine)
-  - [.caseInsensitive](#.caseInsensitive)
-  - [.sticky](#.sticky)
-  - [.unicode](#.unicode)
-  - [.singleLine](#.singleLine)
-  - [.anyChar](#.anyChar)
-  - [.whitespaceChar](#.whitespaceChar)
-  - [.nonWhitespaceChar](#.nonWhitespaceChar)
-  - [.digit](#.digit)
-  - [.nonDigit](#.nonDigit)
-  - [.word](#.word)
-  - [.nonWord](#.nonWord)
-  - [.wordBoundary](#.wordBoundary)
-  - [.nonWordBoundary](#.nonWordBoundary)
-  - [.newline](#.newline)
-  - [.carriageReturn](#.carriageReturn)
-  - [.tab](#.tab)
-  - [.nullByte](#.nullByte)
-  - [.anyOf](#.anyOf)
-  - [.capture](#.capture)
-  - [.end()](#.end())
-  - [.assertAhead](#.assertAhead)
-  - [.assertNotAhead](#.assertNotAhead)
-  - [.optional](#.optional)
-  - [.zeroOrMore](#.zeroOrMore)
-  - [.zeroOrMoreLazy](#.zeroOrMoreLazy)
-  - [.oneOrMore](#.oneOrMore)
-  - [.oneOrMoreLazy](#.oneOrMoreLazy)
-  - [.exactly(n)](#.exactly(n))
-  - [.atLeast(n)](#.atLeast(n))
-  - [.between(x, y)](#.between(x,-y))
-  - [.betweenLazy(x, y)](#.betweenLazy(x,-y))
-  - [.startOfInput](#.startOfInput)
-  - [.endOfInput](#.endOfInput)
-  - [.anyOfChars(chars)](#.anyOfChars(chars))
-  - [.anythingButChars(chars)](#.anythingButChars(chars))
-  - [.anythingButString(str)](#.anythingButString(str))
-  - [.anythingButRange(a, b)](#.anythingButRange(a,-b))
-  - [.string(s)](#.string(s))
-  - [.char(c)](#.char(c))
-  - [.range(a, b)](#.range(a,-b))
-  - [.toRegexString()](#.toRegexString())
-  - [.toRegex()](#.toRegex())
+  - [.allowMultipleMatches](#allowMultipleMatches)
+  - [.lineByLine](#lineByLine)
+  - [.caseInsensitive](#caseInsensitive)
+  - [.sticky](#sticky)
+  - [.unicode](#unicode)
+  - [.singleLine](#singleLine)
+  - [.anyChar](#anyChar)
+  - [.whitespaceChar](#whitespaceChar)
+  - [.nonWhitespaceChar](#nonWhitespaceChar)
+  - [.digit](#digit)
+  - [.nonDigit](#nonDigit)
+  - [.word](#word)
+  - [.nonWord](#nonWord)
+  - [.wordBoundary](#wordBoundary)
+  - [.nonWordBoundary](#nonWordBoundary)
+  - [.newline](#newline)
+  - [.carriageReturn](#carriageReturn)
+  - [.tab](#tab)
+  - [.nullByte](#nullByte)
+  - [.anyOf](#anyOf)
+  - [.capture](#capture)
+  - [.end()](#end())
+  - [.assertAhead](#assertAhead)
+  - [.assertNotAhead](#assertNotAhead)
+  - [.optional](#optional)
+  - [.zeroOrMore](#zeroOrMore)
+  - [.zeroOrMoreLazy](#zeroOrMoreLazy)
+  - [.oneOrMore](#oneOrMore)
+  - [.oneOrMoreLazy](#oneOrMoreLazy)
+  - [.exactly(n)](#exactly(n))
+  - [.atLeast(n)](#atLeast(n))
+  - [.between(x, y)](#between(x,-y))
+  - [.betweenLazy(x, y)](#betweenLazy(x,-y))
+  - [.startOfInput](#startOfInput)
+  - [.endOfInput](#endOfInput)
+  - [.anyOfChars(chars)](#anyOfChars(chars))
+  - [.anythingButChars(chars)](#anythingButChars(chars))
+  - [.anythingButString(str)](#anythingButString(str))
+  - [.anythingButRange(a, b)](#anythingButRange(a,-b))
+  - [.string(s)](#string(s))
+  - [.char(c)](#char(c))
+  - [.range(a, b)](#range(a,-b))
+  - [.toRegexString()](#toRegexString())
+  - [.toRegex()](#toRegex())
 ## Why?
 
 Regex is a very powerful tool, but its terse and cryptic vocabulary can make constructing and communicating them with others a challenge. Even developers who understand them well can have trouble reading their own back just a few months later! In addition, they can't be easily created and manipulated in a programmatic way - closing off an entire avenue of dynamic text processing.
@@ -123,7 +123,7 @@ SuperExpressive()
 
 ### .lineByLine
 
-Uses the `m` flag on the regular expression, which indicates that it should treat the [.startOfInput](#.startOfInput) and [.endOfInput](#.endOfInput) markers as the start and end of lines.
+Uses the `m` flag on the regular expression, which indicates that it should treat the [.startOfInput](#startOfInput) and [.endOfInput](#endOfInput) markers as the start and end of lines.
 
 **Example**
 ```JavaScript
@@ -132,7 +132,7 @@ SuperExpressive()
   .string('^hello$')
   .toRegex();
 // ->
-/hello/m
+/\^hello\$/m
 ```
 
 ### .caseInsensitive
@@ -179,7 +179,7 @@ SuperExpressive()
 
 ### .singleLine
 
-Uses the `s` flag on the regular expression, which indicates that the input should be treated as a single line, where the [.startOfInput](#.startOfInput) and [.endOfInput](#.endOfInput) markers explicitly mark the start and end of input, and [.anyChar](#.anyChar) also matches newlines.
+Uses the `s` flag on the regular expression, which indicates that the input should be treated as a single line, where the [.startOfInput](#startOfInput) and [.endOfInput](#endOfInput) markers explicitly mark the start and end of input, and [.anyChar](#anyChar) also matches newlines.
 
 **Example**
 ```JavaScript
@@ -195,7 +195,7 @@ SuperExpressive()
 
 ### .anyChar
 
-Matches any single character. When combined with [.singleLine](#.singleLine), it also matches newlines.
+Matches any single character. When combined with [.singleLine](#singleLine), it also matches newlines.
 
 **Example**
 ```JavaScript
@@ -285,7 +285,7 @@ SuperExpressive()
 
 ### .wordBoundary
 
-Matches (without consuming any characters) immediately between a character matched by [.word](#.word) and a character not matched by [.word](#.word) (in either order).
+Matches (without consuming any characters) immediately between a character matched by [.word](#word) and a character not matched by [.word](#word) (in either order).
 
 **Example**
 ```JavaScript
@@ -299,7 +299,7 @@ SuperExpressive()
 
 ### .nonWordBoundary
 
-Matches (without consuming any characters) at the position between two characters matched by [.word](#.word).
+Matches (without consuming any characters) at the position between two characters matched by [.word](#word).
 
 **Example**
 ```JavaScript
@@ -416,7 +416,7 @@ SuperExpressive()
 
 ### .end()
 
-Signifies the end of a SuperExpressive grouping, such as [.anyOf](#.anyOf), [.group](#.group), or [.capture](#.capture).
+Signifies the end of a SuperExpressive grouping, such as [.anyOf](#anyOf), [.group](#group), or [.capture](#capture).
 
 **Example**
 ```JavaScript
@@ -584,7 +584,7 @@ SuperExpressive()
 
 ### .startOfInput
 
-Assert the start of input, or the start of a line when [.lineByLine](#.lineByLine) is used.
+Assert the start of input, or the start of a line when [.lineByLine](#lineByLine) is used.
 
 **Example**
 ```JavaScript
@@ -598,7 +598,7 @@ SuperExpressive()
 
 ### .endOfInput
 
-Assert the end of input, or the end of a line when [.lineByLine](#.lineByLine) is used.
+Assert the end of input, or the end of a line when [.lineByLine](#lineByLine) is used.
 
 **Example**
 ```JavaScript
@@ -651,7 +651,7 @@ SuperExpressive()
 
 ### .anythingButRange(a, b)
 
-Matches any character, except those that would be captured by the [.range](#.range(a,-b)) specified by `a` and `b`.
+Matches any character, except those that would be captured by the [.range](#range(a,-b)) specified by `a` and `b`.
 
 **Example**
 ```JavaScript
