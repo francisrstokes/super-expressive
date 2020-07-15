@@ -259,7 +259,7 @@ Matches any non-digit.
 **Example**
 ```JavaScript
 SuperExpressive()
-  .digit
+  .nonDigit
   .toRegex();
 // ->
 /\D/
@@ -692,7 +692,7 @@ SuperExpressive()
   .char('x')
   .toRegex();
 // ->
-/hello/
+/x/
 ```
 
 ### .range(a, b)

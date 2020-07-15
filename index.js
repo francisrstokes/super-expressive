@@ -26,7 +26,7 @@ const partition = (pred, a) => a.reduce((acc, cur) => {
   return acc;
 }, [[], []]);
 
-const specialChars = '\\.^$|?*+()[]{}'.split('');
+const specialChars = '\\.^$|?*+()[]{}-'.split('');
 const replaceAll = (s, find, replace) => s.replace(new RegExp(`\\${find}`, 'g'), replace);
 const escapeSpecial = s => specialChars.reduce((acc, char) => replaceAll(acc, char, `\\${char}`), s);
 
@@ -68,7 +68,7 @@ const t = {
   newline: asType('newline') (),
   carriageReturn: asType('carriageReturn') (),
   tab: asType('tab') (),
-  null: asType('null') (),
+  nullByte: asType('nullByte') (),
   string: asType('string', { quantifierRequiresGroup: true }),
   anyOfChars: asType('anyOfChars'),
   anythingButString: asType('anythingButString'),
@@ -296,7 +296,7 @@ class SuperExpressive {
   anyOfChars(s) {
     const next = this[clone]();
 
-    const elementValue = t.anyOfChars(s);
+    const elementValue = t.anyOfChars(escapeSpecial(s));
     const currentFrame = next[getCurrentFrame]();
 
     currentFrame.elements.push(next[applyQuantifier](elementValue));
@@ -417,7 +417,10 @@ class SuperExpressive {
     const pattern = this[getCurrentElementArray]().map(SuperExpressive[evaluate]).join('');
     const flags = Object.entries(this.state.flags).map(([name, isOn]) => isOn ? name : '').join('');
 
-    return { pattern, flags };
+    return {
+      pattern: pattern === '' ? '(?:)' : pattern,
+      flags
+    };
   }
 
   [applyQuantifier](element) {
@@ -461,7 +464,7 @@ class SuperExpressive {
       case 'newline': return '\\n';
       case 'carriageReturn': return '\\r';
       case 'tab': return '\\t';
-      case 'null': return '\\0';
+      case 'nullByte': return '\\0';
       case 'string': return el.value;
       case 'char': return el.value;
       case 'range': return `[${el.value[0]}-${el.value[1]}]`;
