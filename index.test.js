@@ -134,6 +134,24 @@ describe('SuperExpressive', () => {
   );
 
   testRegexEquality(
+    'namedBackreference',
+    /(?<this_is_the_name>hello \w!)\k<this_is_the_name>/,
+    SuperExpressive()
+      .namedCapture('this_is_the_name')
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+      .namedBackreference('this_is_the_name')
+  );
+
+  testErrorConditition(
+    'namedBackreference no capture group exists',
+    'no capture group called "not_here" exists (create one with .namedCapture())',
+    () => SuperExpressive().namedBackreference('not_here')
+  );
+
+  testRegexEquality(
     'group',
     /(?:hello \w!)/,
     SuperExpressive()

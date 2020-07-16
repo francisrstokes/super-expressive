@@ -50,6 +50,7 @@ const t = {
   endOfInput: asType('endOfInput') (),
   capture: deferredType('capture'),
   namedCapture: name => deferredType('namedCapture', { metadata: name }),
+  namedBackreference: name => deferredType('namedBackreference', { metadata: name }),
   group: deferredType('group'),
   anyOf: deferredType('anyOf'),
   assertAhead: deferredType('assertAhead'),
@@ -135,7 +136,8 @@ class SuperExpressive {
         s: false
       },
       stack: [createStackFrame(t.root)],
-      namedGroups: []
+      namedGroups: [],
+      totalCaptureGroups: 0
     }
   }
 
@@ -195,6 +197,14 @@ class SuperExpressive {
   get tab() { return this[matchElement](t.tab); }
   get nullByte() { return this[matchElement](t.nullByte); }
 
+  namedBackreference(name) {
+    assert(
+      this.state.namedGroups.includes(name),
+      `no capture group called "${name}" exists (create one with .namedCapture())`
+    );
+    return this[matchElement](t.namedBackreference(name));
+  }
+
   [frameCreatingElement](typeFn) {
     const next = this[clone]();
     const newFrame = createStackFrame(typeFn);
@@ -203,10 +213,17 @@ class SuperExpressive {
   }
 
   get anyOf() { return this[frameCreatingElement](t.anyOf); }
-  get capture() { return this[frameCreatingElement](t.capture); }
   get group() { return this[frameCreatingElement](t.group); }
   get assertAhead() { return this[frameCreatingElement](t.assertAhead); }
   get assertNotAhead() { return this[frameCreatingElement](t.assertNotAhead); }
+
+  get capture() {
+    const next = this[clone]();
+    const newFrame = createStackFrame(t.capture);
+    next.state.stack.push(newFrame);
+    next.state.totalCaptureGroups++;
+    return next;
+  }
 
   namedCapture(name) {
     assert(typeof name === 'string', `name must be a string (got ${name})`);
@@ -218,6 +235,7 @@ class SuperExpressive {
     const newFrame = createStackFrame(t.namedCapture(name));
     next.state.namedGroups.push(name);
     next.state.stack.push(newFrame);
+    next.state.totalCaptureGroups++;
     return next;
   }
 
@@ -486,6 +504,7 @@ class SuperExpressive {
       case 'anythingButRange': return `[^${el.value[0]}-${el.value[1]}]`;
       case 'anyOfChars': return `[${el.value}]`;
       case 'anythingButChars': return `[^${el.value}]`;
+      case 'namedBackreference': return `\\k<${el.metadata}>`;
 
       case 'optional':
       case 'zeroOrMore':
