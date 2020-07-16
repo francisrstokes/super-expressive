@@ -96,6 +96,44 @@ describe('SuperExpressive', () => {
   );
 
   testRegexEquality(
+    'namedCapture',
+    /(?<this_is_the_name>hello \w!)/,
+    SuperExpressive()
+      .namedCapture('this_is_the_name')
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+  );
+
+  testErrorConditition(
+    'namedCapture error on bad name',
+    'name is not valid (only letters, numbers, and underscores)',
+    () => SuperExpressive()
+      .namedCapture('hello world')
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+  );
+
+  testErrorConditition(
+    'namedCapture error same name more than once',
+    'cannot use hello again for a capture group',
+    () => SuperExpressive()
+      .namedCapture('hello')
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+      .namedCapture('hello')
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+  );
+
+  testRegexEquality(
     'group',
     /(?:hello \w!)/,
     SuperExpressive()
@@ -155,7 +193,6 @@ describe('SuperExpressive', () => {
     () => SuperExpressive().char('hello')
   );
 
-  testRegexEquality('range', /[a-z]/, SuperExpressive().range('a', 'z'));
   testRegexEquality('range', /[a-z]/, SuperExpressive().range('a', 'z'));
 
 
