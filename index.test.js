@@ -85,7 +85,7 @@ describe('SuperExpressive', () => {
   );
 
   testRegexEquality(
-    'capture',
+    'capture: unnamed',
     /(hello \w!)/,
     SuperExpressive()
       .capture()
@@ -96,7 +96,7 @@ describe('SuperExpressive', () => {
   );
 
   testRegexEquality(
-    'capture named',
+    'capture: named',
     /(?<myname> hello \w!)/,
     SuperExpressive()
       .capture('myname')
