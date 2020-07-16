@@ -152,6 +152,24 @@ describe('SuperExpressive', () => {
   );
 
   testRegexEquality(
+    'backreference',
+    /(hello \w!)\1/,
+    SuperExpressive()
+      .capture
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+      .backreference(1)
+  );
+
+  testErrorConditition(
+    'backreference no capture group exists',
+    'invalid index 1. There are 0 capture groups on this SuperExpression',
+    () => SuperExpressive().backreference(1)
+  );
+
+  testRegexEquality(
     'group',
     /(?:hello \w!)/,
     SuperExpressive()

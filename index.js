@@ -51,6 +51,7 @@ const t = {
   capture: deferredType('capture'),
   namedCapture: name => deferredType('namedCapture', { metadata: name }),
   namedBackreference: name => deferredType('namedBackreference', { metadata: name }),
+  backreference: index => deferredType('backreference', { metadata: index }),
   group: deferredType('group'),
   anyOf: deferredType('anyOf'),
   assertAhead: deferredType('assertAhead'),
@@ -203,6 +204,16 @@ class SuperExpressive {
       `no capture group called "${name}" exists (create one with .namedCapture())`
     );
     return this[matchElement](t.namedBackreference(name));
+  }
+
+  backreference(index) {
+    assert(typeof index === 'number', 'index must be a number');
+    assert(
+      index > 0 && index <= this.state.totalCaptureGroups,
+      `invalid index ${index}. There are ${this.state.totalCaptureGroups} capture groups on this SuperExpression`
+      );
+
+    return this[matchElement](t.backreference(index));
   }
 
   [frameCreatingElement](typeFn) {
@@ -505,6 +516,7 @@ class SuperExpressive {
       case 'anyOfChars': return `[${el.value}]`;
       case 'anythingButChars': return `[^${el.value}]`;
       case 'namedBackreference': return `\\k<${el.metadata}>`;
+      case 'backreference': return `\\${el.metadata}`;
 
       case 'optional':
       case 'zeroOrMore':
