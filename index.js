@@ -199,11 +199,7 @@ class SuperExpressive {
   }
 
   get anyOf() { return this[frameCreatingElement](t.anyOf); }
-  
-  capture(name = '') { 
-      return this[frameCreatingElement](t.capture(name)); 
-  }
-  
+  capture(name = '') { return this[frameCreatingElement](t.capture(name)); }
   get group() { return this[frameCreatingElement](t.group); }
   get assertAhead() { return this[frameCreatingElement](t.assertAhead); }
   get assertNotAhead() { return this[frameCreatingElement](t.assertNotAhead); }
@@ -527,7 +523,7 @@ class SuperExpressive {
       }
 
       case 'capture': {
-        const name = el.name ? `?<${el.name}> ` : '';
+        const name = el.name ? `?<${el.name}>` : '';
         const evaluated = el.value.map(SuperExpressive[evaluate]);
         return `(${name}${evaluated.join('')})`;
       }

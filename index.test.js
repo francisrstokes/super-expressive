@@ -97,7 +97,7 @@ describe('SuperExpressive', () => {
 
   testRegexEquality(
     'capture: named',
-    /(?<myname> hello \w!)/,
+    /(?<myname>hello \w!)/,
     SuperExpressive()
       .capture('myname')
         .string('hello ')
