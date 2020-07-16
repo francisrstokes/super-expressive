@@ -1,6 +1,6 @@
 const asType = (type, opts = {}) => value => ({ type, value, ...opts });
-const deferredType = type => {
-  const typeFn = asType (type);
+const deferredType = (type, opts = {}) => {
+  const typeFn = asType (type, opts);
   return typeFn (typeFn);
 };
 
@@ -30,6 +30,8 @@ const specialChars = '\\.^$|?*+()[]{}-'.split('');
 const replaceAll = (s, find, replace) => s.replace(new RegExp(`\\${find}`, 'g'), replace);
 const escapeSpecial = s => specialChars.reduce((acc, char) => replaceAll(acc, char, `\\${char}`), s);
 
+const namedGroupRegex = /^[a-z]+\w*$/i;
+
 const quantifierTable = {
   oneOrMore: '+',
   oneOrMoreLazy: '+?',
@@ -47,14 +49,17 @@ const t = {
   startOfInput: asType('startOfInput') (),
   endOfInput: asType('endOfInput') (),
   capture: deferredType('capture'),
+  namedCapture: name => deferredType('namedCapture', { metadata: name }),
+  namedBackreference: name => deferredType('namedBackreference', { metadata: name }),
+  backreference: index => deferredType('backreference', { metadata: index }),
   group: deferredType('group'),
   anyOf: deferredType('anyOf'),
   assertAhead: deferredType('assertAhead'),
   assertNotAhead: deferredType('assertNotAhead'),
-  exactly: times => ({ ...deferredType('exactly'), metadata: times }),
-  atLeast: times => ({ ...deferredType('atLeast'), metadata: times }),
-  between: (x, y) => ({ ...deferredType('between'), metadata: [x, y] }),
-  betweenLazy: (x, y) => ({ ...deferredType('betweenLazy'), metadata: [x, y] }),
+  exactly: times => deferredType('exactly', { metadata: times }),
+  atLeast: times => deferredType('atLeast', { metadata: times }),
+  between: (x, y) => deferredType('between', { metadata: [x, y] }),
+  betweenLazy: (x, y) => deferredType('betweenLazy', { metadata: [x, y] }),
   anyChar: asType('anyChar') (),
   whitespaceChar: asType('whitespaceChar') (),
   nonWhitespaceChar: asType('nonWhitespaceChar') (),
@@ -131,7 +136,8 @@ class SuperExpressive {
         s: false
       },
       stack: [createStackFrame(t.root)],
-      namedGroups: []
+      namedGroups: [],
+      totalCaptureGroups: 0
     }
   }
 
@@ -191,6 +197,24 @@ class SuperExpressive {
   get tab() { return this[matchElement](t.tab); }
   get nullByte() { return this[matchElement](t.nullByte); }
 
+  namedBackreference(name) {
+    assert(
+      this.state.namedGroups.includes(name),
+      `no capture group called "${name}" exists (create one with .namedCapture())`
+    );
+    return this[matchElement](t.namedBackreference(name));
+  }
+
+  backreference(index) {
+    assert(typeof index === 'number', 'index must be a number');
+    assert(
+      index > 0 && index <= this.state.totalCaptureGroups,
+      `invalid index ${index}. There are ${this.state.totalCaptureGroups} capture groups on this SuperExpression`
+      );
+
+    return this[matchElement](t.backreference(index));
+  }
+
   [frameCreatingElement](typeFn) {
     const next = this[clone]();
     const newFrame = createStackFrame(typeFn);
@@ -199,10 +223,31 @@ class SuperExpressive {
   }
 
   get anyOf() { return this[frameCreatingElement](t.anyOf); }
-  get capture() { return this[frameCreatingElement](t.capture); }
   get group() { return this[frameCreatingElement](t.group); }
   get assertAhead() { return this[frameCreatingElement](t.assertAhead); }
   get assertNotAhead() { return this[frameCreatingElement](t.assertNotAhead); }
+
+  get capture() {
+    const next = this[clone]();
+    const newFrame = createStackFrame(t.capture);
+    next.state.stack.push(newFrame);
+    next.state.totalCaptureGroups++;
+    return next;
+  }
+
+  namedCapture(name) {
+    assert(typeof name === 'string', `name must be a string (got ${name})`);
+    assert(name.length > 0, `name must be at least one character`);
+    assert(!this.state.namedGroups.includes(name), `cannot use ${name} again for a capture group`);
+    assert(namedGroupRegex.test(name), `name is not valid (only letters, numbers, and underscores)`);
+
+    const next = this[clone]();
+    const newFrame = createStackFrame(t.namedCapture(name));
+    next.state.namedGroups.push(name);
+    next.state.stack.push(newFrame);
+    next.state.totalCaptureGroups++;
+    return next;
+  }
 
   [quantifierElement](typeFnName) {
     const next = this[clone]();
@@ -426,7 +471,6 @@ class SuperExpressive {
     const currentFrame = this[getCurrentFrame]();
     if (currentFrame.quantifier) {
       const wrapped = currentFrame.quantifier.value(element);
-      wrapped.metadata = currentFrame.quantifier.metadata;
       currentFrame.quantifier = null;
       return wrapped;
     }
@@ -470,6 +514,8 @@ class SuperExpressive {
       case 'anythingButRange': return `[^${el.value[0]}-${el.value[1]}]`;
       case 'anyOfChars': return `[${el.value}]`;
       case 'anythingButChars': return `[^${el.value}]`;
+      case 'namedBackreference': return `\\k<${el.metadata}>`;
+      case 'backreference': return `\\${el.metadata}`;
 
       case 'optional':
       case 'zeroOrMore':
@@ -525,6 +571,11 @@ class SuperExpressive {
       case 'capture': {
         const evaluated = el.value.map(SuperExpressive[evaluate]);
         return `(${evaluated.join('')})`;
+      }
+
+      case 'namedCapture': {
+        const evaluated = el.value.map(SuperExpressive[evaluate]);
+        return `(?<${el.metadata}>${evaluated.join('')})`;
       }
 
       case 'group': {

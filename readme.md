@@ -404,6 +404,61 @@ SuperExpressive()
 /([a-f][0-9]XXX)/
 ```
 
+### .namedCapture(name)
+
+Creates a named capture group for the proceeding elements. Needs to be finalised with `.end()`.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .namedCapture('interestingStuff')
+    .range('a', 'f')
+    .range('0', '9')
+    .string('XXX')
+  .end()
+  .toRegex();
+// ->
+/(?<interestingStuff>[a-f][0-9]XXX)/
+```
+
+### .namedBackreference(name)
+
+Matches exactly what was previously matched by a [namedCapture](#namedCapture(name)).
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .namedCapture('interestingStuff')
+    .range('a', 'f')
+    .range('0', '9')
+    .string('XXX')
+  .end()
+  .string('something else')
+  .namedBackreference('interestingStuff')
+  .toRegex();
+// ->
+/(?<interestingStuff>[a-f][0-9]XXX)something else\k<interestingStuff>/
+```
+
+### .backreference(index)
+
+Matches exactly what was previously matched by a [capture](#capture) or [namedCapture](#namedCapture(name)) using a positional index. Note regex indexes start at 1, so the first capture group has index 1.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .capture
+    .range('a', 'f')
+    .range('0', '9')
+    .string('XXX')
+  .end()
+  .string('something else')
+  .backreference(1)
+  .toRegex();
+// ->
+/([a-f][0-9]XXX)something else\1/
+```
+
 ### .group
 
 Creates a non-capturing group of the proceeding elements. Needs to be finalised with `.end()`.

@@ -96,6 +96,80 @@ describe('SuperExpressive', () => {
   );
 
   testRegexEquality(
+    'namedCapture',
+    /(?<this_is_the_name>hello \w!)/,
+    SuperExpressive()
+      .namedCapture('this_is_the_name')
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+  );
+
+  testErrorConditition(
+    'namedCapture error on bad name',
+    'name is not valid (only letters, numbers, and underscores)',
+    () => SuperExpressive()
+      .namedCapture('hello world')
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+  );
+
+  testErrorConditition(
+    'namedCapture error same name more than once',
+    'cannot use hello again for a capture group',
+    () => SuperExpressive()
+      .namedCapture('hello')
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+      .namedCapture('hello')
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+  );
+
+  testRegexEquality(
+    'namedBackreference',
+    /(?<this_is_the_name>hello \w!)\k<this_is_the_name>/,
+    SuperExpressive()
+      .namedCapture('this_is_the_name')
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+      .namedBackreference('this_is_the_name')
+  );
+
+  testErrorConditition(
+    'namedBackreference no capture group exists',
+    'no capture group called "not_here" exists (create one with .namedCapture())',
+    () => SuperExpressive().namedBackreference('not_here')
+  );
+
+  testRegexEquality(
+    'backreference',
+    /(hello \w!)\1/,
+    SuperExpressive()
+      .capture
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+      .backreference(1)
+  );
+
+  testErrorConditition(
+    'backreference no capture group exists',
+    'invalid index 1. There are 0 capture groups on this SuperExpression',
+    () => SuperExpressive().backreference(1)
+  );
+
+  testRegexEquality(
     'group',
     /(?:hello \w!)/,
     SuperExpressive()
@@ -155,7 +229,6 @@ describe('SuperExpressive', () => {
     () => SuperExpressive().char('hello')
   );
 
-  testRegexEquality('range', /[a-z]/, SuperExpressive().range('a', 'z'));
   testRegexEquality('range', /[a-z]/, SuperExpressive().range('a', 'z'));
 
 
