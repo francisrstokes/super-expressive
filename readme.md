@@ -35,6 +35,10 @@
   - [.nullByte](#nullByte)
   - [.anyOf](#anyOf)
   - [.capture](#capture)
+  - [.namedCapture(name)](#namedCapture(name))
+  - [.backreference(index)](#backreference(index))
+  - [.namedBackreference(index)](#namedBackreference(index))
+  - [.group](#group)
   - [.end()](#end())
   - [.assertAhead](#assertAhead)
   - [.assertNotAhead](#assertNotAhead)
@@ -389,7 +393,7 @@ SuperExpressive()
 
 ### .capture
 
-Creates a capture group for the proceeding elements. Needs to be finalised with `.end()`.
+Creates a capture group for the proceeding elements. Needs to be finalised with `.end()`. Can be later referenced with [backreference(index)](#backreference(index)).
 
 **Example**
 ```JavaScript
@@ -406,7 +410,7 @@ SuperExpressive()
 
 ### .namedCapture(name)
 
-Creates a named capture group for the proceeding elements. Needs to be finalised with `.end()`.
+Creates a named capture group for the proceeding elements. Needs to be finalised with `.end()`. Can be later referenced with [namedBackreference(name)](#namedBackreference(name)) or [backreference(index)](#backreference(index)).
 
 **Example**
 ```JavaScript
