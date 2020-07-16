@@ -62,7 +62,6 @@ const t = {
   nonDigit: asType('nonDigit') (),
   word: asType('word') (),
   nonWord: asType('nonWord') (),
-  nonWord: asType('nonWord') (),
   wordBoundary: asType('wordBoundary') (),
   nonWordBoundary: asType('nonWordBoundary') (),
   newline: asType('newline') (),
