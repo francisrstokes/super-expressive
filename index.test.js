@@ -88,7 +88,18 @@ describe('SuperExpressive', () => {
     'capture',
     /(hello \w!)/,
     SuperExpressive()
-      .capture
+      .capture()
+        .string('hello ')
+        .word
+        .char('!')
+      .end()
+  );
+
+  testRegexEquality(
+    'capture named',
+    /(?<myname> hello \w!)/,
+    SuperExpressive()
+      .capture('myname')
         .string('hello ')
         .word
         .char('!')

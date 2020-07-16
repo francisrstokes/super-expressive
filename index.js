@@ -1,6 +1,6 @@
 const asType = (type, opts = {}) => value => ({ type, value, ...opts });
-const deferredType = type => {
-  const typeFn = asType (type);
+const deferredType = (type, opts) => {
+  const typeFn = asType (type, opts);
   return typeFn (typeFn);
 };
 
@@ -46,7 +46,7 @@ const t = {
   root: asType('root') (),
   startOfInput: asType('startOfInput') (),
   endOfInput: asType('endOfInput') (),
-  capture: deferredType('capture'),
+  capture: name => deferredType('capture', {name}),
   group: deferredType('group'),
   anyOf: deferredType('anyOf'),
   assertAhead: deferredType('assertAhead'),
@@ -199,7 +199,11 @@ class SuperExpressive {
   }
 
   get anyOf() { return this[frameCreatingElement](t.anyOf); }
-  get capture() { return this[frameCreatingElement](t.capture); }
+  
+  capture(name = '') { 
+      return this[frameCreatingElement](t.capture(name)); 
+  }
+  
   get group() { return this[frameCreatingElement](t.group); }
   get assertAhead() { return this[frameCreatingElement](t.assertAhead); }
   get assertNotAhead() { return this[frameCreatingElement](t.assertNotAhead); }
@@ -523,8 +527,9 @@ class SuperExpressive {
       }
 
       case 'capture': {
+        const name = el.name ? `?<${el.name}> ` : '';
         const evaluated = el.value.map(SuperExpressive[evaluate]);
-        return `(${evaluated.join('')})`;
+        return `(${name}${evaluated.join('')})`;
       }
 
       case 'group': {
@@ -542,6 +547,5 @@ class SuperExpressive {
     return new SuperExpressive();
   }
 }
-
 
 module.exports = SuperExpressive.create;
