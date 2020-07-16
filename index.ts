@@ -1,34 +1,47 @@
-const asType = (type, opts = {}) => value => ({ type, value, ...opts });
-const deferredType = type => {
+interface Element {
+  type: string;
+  value?: any; // Not sure how to type it
+  metadata?: any;
+  quantifierRequiresGroup?: boolean;
+}
+
+const asType: (type: string, opts?: {}) => (value?: unknown) => Element = 
+    (type, opts = {}) => value => ({ type, value, ...opts });
+
+const deferredType = (type: string) => {
   const typeFn = asType (type);
   return typeFn (typeFn);
 };
 
-const deepCopy = o => {
+const deepCopy = <T extends any>(o: T): T => {
   if (Array.isArray(o)) {
-    return o.map(deepCopy);
+    return o.map(deepCopy) as T;
   }
   if (Object.prototype.toString.call(o) === '[object Object]') {
-    return Object.entries(o).reduce((acc, [k, v]) => {
+    return Object.entries(o as object).reduce((acc, [k, v]) => {
       acc[k] = deepCopy(v);
       return acc;
-    }, {});
+    }, {} as any) as T;
   }
   return o;
 }
 
-const partition = (pred, a) => a.reduce((acc, cur) => {
+// TS doesn't yet support the following to be written as:
+// type Predicate<T1> = (arg: T1) => arg is T2;
+// i.e. a user-defined type guard as a type alias.
+type Predicate<T> = (arg: T) => boolean;
+const partition = <T1, T2>(pred: Predicate<T1 | T2>, a: (T1 | T2)[]) => a.reduce((acc, cur) => {
   if (pred(cur)) {
-    acc[0].push(cur);
+    acc[0].push(cur as T1);
   } else {
-    acc[1].push(cur);
+    acc[1].push(cur as T2);
   }
   return acc;
-}, [[], []]);
+}, [[], []] as [T1[], T2[]]);
 
 const specialChars = '\\.^$|?*+()[]{}-'.split('');
-const replaceAll = (s, find, replace) => s.replace(new RegExp(`\\${find}`, 'g'), replace);
-const escapeSpecial = s => specialChars.reduce((acc, char) => replaceAll(acc, char, `\\${char}`), s);
+const replaceAll = (s: string, find: unknown, replace: string) => s.replace(new RegExp(`\\${find}`, 'g'), replace);
+const escapeSpecial = (s: string) => specialChars.reduce((acc, char) => replaceAll(acc, char, `\\${char}`), s);
 
 const quantifierTable = {
   oneOrMore: '+',
@@ -36,10 +49,10 @@ const quantifierTable = {
   zeroOrMore: '*',
   zeroOrMoreLazy: '*?',
   optional: '?',
-  exactly: metadata => `{${metadata}}`,
-  atLeast: metadata => `{${metadata},}`,
-  between: metadata => `{${metadata[0]},${metadata[1]}}`,
-  betweenLazy: metadata => `{${metadata[0]},${metadata[1]}}?`,
+  exactly: (metadata: number) => `{${metadata}}`,
+  atLeast: (metadata: number) => `{${metadata},}`,
+  between: (metadata: [number, number]) => `{${metadata[0]},${metadata[1]}}`,
+  betweenLazy: (metadata: [number, number]) => `{${metadata[0]},${metadata[1]}}?`,
 }
 
 const t = {
@@ -51,17 +64,16 @@ const t = {
   anyOf: deferredType('anyOf'),
   assertAhead: deferredType('assertAhead'),
   assertNotAhead: deferredType('assertNotAhead'),
-  exactly: times => ({ ...deferredType('exactly'), metadata: times }),
-  atLeast: times => ({ ...deferredType('atLeast'), metadata: times }),
-  between: (x, y) => ({ ...deferredType('between'), metadata: [x, y] }),
-  betweenLazy: (x, y) => ({ ...deferredType('betweenLazy'), metadata: [x, y] }),
+  exactly: (times: number) => ({ ...deferredType('exactly'), metadata: times }),
+  atLeast: (times: number) => ({ ...deferredType('atLeast'), metadata: times }),
+  between: (x: number, y: number) => ({ ...deferredType('between'), metadata: [x, y] }),
+  betweenLazy: (x: number, y: number) => ({ ...deferredType('betweenLazy'), metadata: [x, y] }),
   anyChar: asType('anyChar') (),
   whitespaceChar: asType('whitespaceChar') (),
   nonWhitespaceChar: asType('nonWhitespaceChar') (),
   digit: asType('digit') (),
   nonDigit: asType('nonDigit') (),
   word: asType('word') (),
-  nonWord: asType('nonWord') (),
   nonWord: asType('nonWord') (),
   wordBoundary: asType('wordBoundary') (),
   nonWordBoundary: asType('nonWordBoundary') (),
@@ -83,13 +95,17 @@ const t = {
   optional: deferredType('optional'),
 }
 
-const isFusable = element => {
+interface FusableElement {
+  type: 'range' | 'char' | 'anyOfChars';
+  value: any; // Not sure how to type it.
+}
+const isFusable = (element: Element): element is FusableElement => {
   return element.type === 'range' ||
     element.type === 'char' ||
     element.type === 'anyOfChars';
 };
-const fuseElements = elements => {
-  const [fusables, rest] = partition(isFusable, elements);
+const fuseElements = (elements: Element[]) => {
+  const [fusables, rest] = partition<FusableElement, Element>(isFusable, elements);
   const fused = fusables.map(el => {
     if (el.type === 'char' || el.type === 'anyOfChars') {
       return el.value;
@@ -99,9 +115,15 @@ const fuseElements = elements => {
   return [fused, rest];
 }
 
-const createStackFrame = type => ({ type, quantifier: null, elements: [] });
+interface Frame {
+  type: Element;
+  quantifier: Element | null;
+  elements: Element[];
+}
 
-const assert = (condition, message) => {
+const createStackFrame = (type: Element): Frame => ({ type, quantifier: null, elements: [] });
+
+const assert = (condition: boolean, message: string) => {
   if (!condition) {
     throw new Error(message);
   }
@@ -118,7 +140,18 @@ const matchElement = Symbol('matchElement');
 const frameCreatingElement = Symbol('frameCreatingElement');
 const quantifierElement = Symbol('quantifierElement');
 
+type Flag = 'g' | 'y' | 'm' | 'i' | 'u' | 's';
+interface SuperExpressiveState {
+  hasDefinedStart: boolean;
+  hasDefinedEnd: boolean;
+  flags: { [K in Flag]: boolean };
+  stack: Frame[];
+  namedGroups: unknown[];
+}
+
 class SuperExpressive {
+  private state: SuperExpressiveState;
+
   constructor() {
     this.state = {
       hasDefinedStart: false,
@@ -136,82 +169,82 @@ class SuperExpressive {
     }
   }
 
-  get allowMultipleMatches() {
+  get allowMultipleMatches(): SuperExpressive {
     const next = this[clone]();
     next.state.flags.g = true;
     return next;
   }
 
-  get lineByLine() {
+  get lineByLine(): SuperExpressive {
     const next = this[clone]();
     next.state.flags.m = true;
     return next;
   }
 
-  get caseInsensitive() {
+  get caseInsensitive(): SuperExpressive {
     const next = this[clone]();
     next.state.flags.i = true;
     return next;
   }
 
-  get sticky() {
+  get sticky(): SuperExpressive {
     const next = this[clone]();
     next.state.flags.y = true;
     return next;
   }
 
-  get unicode() {
+  get unicode(): SuperExpressive {
     const next = this[clone]();
     next.state.flags.u = true;
     return next;
   }
 
-  get singleLine() {
+  get singleLine(): SuperExpressive {
     const next = this[clone]();
     next.state.flags.s = true;
     return next;
   }
 
-  [matchElement](typeFn) {
+  [matchElement](typeFn: Element): SuperExpressive {
     const next = this[clone]();
     next[getCurrentElementArray]().push(next[applyQuantifier](typeFn));
     return next;
   }
 
-  get anyChar() { return this[matchElement](t.anyChar); }
-  get whitespaceChar() { return this[matchElement](t.whitespaceChar); }
-  get nonWhitespaceChar() { return this[matchElement](t.nonWhitespaceChar); }
-  get digit() { return this[matchElement](t.digit); }
-  get nonDigit() { return this[matchElement](t.nonDigit); }
-  get word() { return this[matchElement](t.word); }
-  get nonWord() { return this[matchElement](t.nonWord); }
-  get wordBoundary() { return this[matchElement](t.wordBoundary); }
-  get nonWordBoundary() { return this[matchElement](t.nonWordBoundary); }
-  get newline() { return this[matchElement](t.newline); }
-  get carriageReturn() { return this[matchElement](t.carriageReturn); }
-  get tab() { return this[matchElement](t.tab); }
-  get nullByte() { return this[matchElement](t.nullByte); }
+  get anyChar(): SuperExpressive { return this[matchElement](t.anyChar); }
+  get whitespaceChar(): SuperExpressive { return this[matchElement](t.whitespaceChar); }
+  get nonWhitespaceChar(): SuperExpressive { return this[matchElement](t.nonWhitespaceChar); }
+  get digit(): SuperExpressive { return this[matchElement](t.digit); }
+  get nonDigit(): SuperExpressive { return this[matchElement](t.nonDigit); }
+  get word(): SuperExpressive { return this[matchElement](t.word); }
+  get nonWord(): SuperExpressive { return this[matchElement](t.nonWord); }
+  get wordBoundary(): SuperExpressive { return this[matchElement](t.wordBoundary); }
+  get nonWordBoundary(): SuperExpressive { return this[matchElement](t.nonWordBoundary); }
+  get newline(): SuperExpressive { return this[matchElement](t.newline); }
+  get carriageReturn(): SuperExpressive { return this[matchElement](t.carriageReturn); }
+  get tab(): SuperExpressive { return this[matchElement](t.tab); }
+  get nullByte(): SuperExpressive { return this[matchElement](t.nullByte); }
 
-  [frameCreatingElement](typeFn) {
+  [frameCreatingElement](typeFn: Element): SuperExpressive {
     const next = this[clone]();
     const newFrame = createStackFrame(typeFn);
     next.state.stack.push(newFrame);
     return next;
   }
 
-  get anyOf() { return this[frameCreatingElement](t.anyOf); }
-  get capture() { return this[frameCreatingElement](t.capture); }
-  get group() { return this[frameCreatingElement](t.group); }
-  get assertAhead() { return this[frameCreatingElement](t.assertAhead); }
-  get assertNotAhead() { return this[frameCreatingElement](t.assertNotAhead); }
+  get anyOf(): SuperExpressive { return this[frameCreatingElement](t.anyOf); }
+  get capture(): SuperExpressive { return this[frameCreatingElement](t.capture); }
+  get group(): SuperExpressive { return this[frameCreatingElement](t.group); }
+  get assertAhead(): SuperExpressive { return this[frameCreatingElement](t.assertAhead); }
+  get assertNotAhead(): SuperExpressive { return this[frameCreatingElement](t.assertNotAhead); }
 
-  [quantifierElement](typeFnName) {
+  [quantifierElement](typeFnName: keyof typeof t): SuperExpressive {
     const next = this[clone]();
     const currentFrame = next[getCurrentFrame]();
     if (currentFrame.quantifier) {
       throw new Error(`cannot quantify regular expression with "${typeFnName}" because it's already being quantified with "${currentFrame.quantifier.type}"`);
     }
-    currentFrame.quantifier = t[typeFnName];
+    currentFrame.quantifier = t[typeFnName] as Element;
     return next;
   }
 
@@ -221,7 +254,7 @@ class SuperExpressive {
   get oneOrMore() { return this[quantifierElement]('oneOrMore'); }
   get oneOrMoreLazy() { return this[quantifierElement]('oneOrMoreLazy'); }
 
-  exactly(n) {
+  exactly(n: number): SuperExpressive {
     assert(Number.isInteger(n) && n > 0, `n must be a positive integer (got ${n})`);
 
     const next = this[clone]();
@@ -233,7 +266,7 @@ class SuperExpressive {
     return next;
   }
 
-  atLeast(n) {
+  atLeast(n: number): SuperExpressive {
     assert(Number.isInteger(n) && n > 0, `n must be a positive integer (got ${n})`);
 
     const next = this[clone]();
@@ -245,7 +278,7 @@ class SuperExpressive {
     return next;
   }
 
-  between(x, y) {
+  between(x: number, y: number): SuperExpressive {
     assert(Number.isInteger(x) && x >= 0, `x must be an integer (got ${x})`);
     assert(Number.isInteger(y) && y > 0, `y must be an integer greater than 0 (got ${y})`);
     assert(x < y, `x must be less than y (x = ${x}, y = ${y})`);
@@ -259,7 +292,7 @@ class SuperExpressive {
     return next;
   }
 
-  betweenLazy(x, y) {
+  betweenLazy(x: number, y: number): SuperExpressive {
     assert(Number.isInteger(x) && x >= 0, `x must be an integer (got ${x})`);
     assert(Number.isInteger(y) && y > 0, `y must be an integer greater than 0 (got ${y})`);
     assert(x < y, `x must be less than y (x = ${x}, y = ${y})`);
@@ -273,7 +306,7 @@ class SuperExpressive {
     return next;
   }
 
-  get startOfInput() {
+  get startOfInput(): SuperExpressive {
     assert(!this.state.hasDefinedStart, 'This regex already has a defined start of input');
     assert(!this.state.hasDefinedEnd, 'Cannot define the start of input after the end of input');
 
@@ -283,7 +316,7 @@ class SuperExpressive {
     return next;
   }
 
-  get endOfInput() {
+  get endOfInput(): SuperExpressive {
     if (this.state.hasDefinedEnd) {
       throw new Error('This regex already has a defined end of input');
     }
@@ -293,7 +326,7 @@ class SuperExpressive {
     return next;
   }
 
-  anyOfChars(s) {
+  anyOfChars(s: string): SuperExpressive {
     const next = this[clone]();
 
     const elementValue = t.anyOfChars(escapeSpecial(s));
@@ -304,19 +337,19 @@ class SuperExpressive {
     return next;
   }
 
-  end() {
+  end(): SuperExpressive {
     const next = this[clone]();
     if (next.state.stack.length === 1) {
       throw new Error(`Cannot call end while building the root expression.`);
     }
 
-    const oldFrame = next.state.stack.pop();
+    const oldFrame = next.state.stack.pop()!;
     const currentFrame = next[getCurrentFrame]();
     currentFrame.elements.push(next[applyQuantifier](oldFrame.type.value(oldFrame.elements)));
     return next;
   }
 
-  anythingButString(str) {
+  anythingButString(str: string): SuperExpressive {
     assert(typeof str === 'string', `str must be a string (got ${str})`);
     assert(str.length > 0, `str must have least one character`);
 
@@ -328,7 +361,7 @@ class SuperExpressive {
     return next;
   }
 
-  anythingButChars(chars) {
+  anythingButChars(chars: string): SuperExpressive {
     assert(typeof chars === 'string', `chars must be a string (got ${chars})`);
     assert(chars.length > 0, `chars must have at least one character`);
 
@@ -340,7 +373,7 @@ class SuperExpressive {
     return next;
   }
 
-  anythingButRange(a, b) {
+  anythingButRange(a: string | number, b: string | number): SuperExpressive {
     const strA = a.toString();
     const strB = b.toString();
 
@@ -356,7 +389,7 @@ class SuperExpressive {
     return next;
   }
 
-  string(s) {
+  string(s: string): SuperExpressive {
     assert(typeof s === 'string', `s must be a string (got ${s})`);
     assert(s.length >= 0, `s cannot be an empty string`);
 
@@ -368,7 +401,7 @@ class SuperExpressive {
     return next;
   }
 
-  char(c) {
+  char(c: string): SuperExpressive {
     assert(typeof c === 'string', `c must be a string (got ${c})`);
     assert(c.length === 1, `char() can only be called with a single character (got ${c})`);
 
@@ -379,7 +412,7 @@ class SuperExpressive {
     return next;
   }
 
-  range(a, b) {
+  range(a: string | number, b: string | number) {
     const strA = a.toString();
     const strB = b.toString();
 
@@ -397,17 +430,17 @@ class SuperExpressive {
     return next;
   }
 
-  toRegexString() {
+  toRegexString(): string {
     const {pattern, flags} = this[getRegexPatternAndFlags]();
     return `/${pattern}/${flags}`;
   }
 
-  toRegex() {
+  toRegex(): RegExp {
     const {pattern, flags} = this[getRegexPatternAndFlags]();
     return new RegExp(pattern, flags);
   }
 
-  [getRegexPatternAndFlags]() {
+  [getRegexPatternAndFlags](): { pattern: string; flags: string } {
     assert(
       this.state.stack.length === 1,
       'Cannot compute the value of a not yet fully specified regex object.' +
@@ -423,7 +456,7 @@ class SuperExpressive {
     };
   }
 
-  [applyQuantifier](element) {
+  [applyQuantifier](element: Element): Element {
     const currentFrame = this[getCurrentFrame]();
     if (currentFrame.quantifier) {
       const wrapped = currentFrame.quantifier.value(element);
@@ -434,21 +467,21 @@ class SuperExpressive {
     return element;
   }
 
-  [getCurrentFrame]() {
+  [getCurrentFrame](): Frame {
     return this.state.stack[this.state.stack.length - 1];
   }
 
-  [getCurrentElementArray]() {
+  [getCurrentElementArray](): Element[] {
     return this[getCurrentFrame]().elements;
   }
 
-  [clone]() {
+  [clone](): SuperExpressive {
     const next = new SuperExpressive();
     next.state = deepCopy(this.state);
     return next;
   }
 
-  static [evaluate](el) {
+  static [evaluate](el: Element): string {
     switch (el.type) {
       case 'anyChar': return '.';
       case 'whitespaceChar': return '\\s';
@@ -497,7 +530,7 @@ class SuperExpressive {
       }
 
       case 'anythingButString': {
-        const chars = el.value.split('').map(c => `[^${c}]`).join('');
+        const chars = el.value.split('').map((c: string) => `[^${c}]`).join('');
         return `(?:${chars})`;
       }
 
@@ -518,7 +551,7 @@ class SuperExpressive {
           return `[${fused}]`;
         }
 
-        const evaluatedRest = rest.map(SuperExpressive[evaluate]);
+        const evaluatedRest = (rest as Element[]).map(SuperExpressive[evaluate]);
         const separator = (evaluatedRest.length > 0 && fused.length > 0) ? '|' : '';
         return `(?:${evaluatedRest.join('|')}${separator}${fused ? `[${fused}]` : ''})`;
       }
@@ -539,10 +572,9 @@ class SuperExpressive {
     }
   }
 
-  static create() {
+  static create(): SuperExpressive {
     return new SuperExpressive();
   }
 }
 
-
-module.exports = SuperExpressive.create;
+export = SuperExpressive.create;
