@@ -1,2 +1,5 @@
 readme.md
 logo.png
+.nyc_output/
+test.js
+index.test.js
