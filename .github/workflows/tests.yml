@@ -1,0 +1,31 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm i
+    - run: npm run test:coverage
+      env:
+        CI: true
+
+    - name: Report on coverage
+      if: github.event_name == 'pull_request'
+      uses: slavcodev/coverage-monitor-action@1.1.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        clover_file: "coverage/clover.xml"
+        threshold_alert: 50
+        threshold_warning: 90
