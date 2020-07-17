@@ -235,4 +235,4 @@ declare class SuperExpressive {
  */
 declare function SuperExpressive(): SuperExpressive;
 
-export default SuperExpressive;
+export = SuperExpressive;
