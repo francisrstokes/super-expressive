@@ -810,7 +810,7 @@ SuperExpressive()
     .end()
   .end()
   .endOfInput
-  .toRegexString();
+  .toRegex();
 // ->
 /^(?:0x)?([A-Fa-f0-9]{4})$/gm
 ```
