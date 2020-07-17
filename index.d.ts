@@ -109,9 +109,27 @@ declare class SuperExpressive {
     capture: SuperExpressive;
 
     /**
+     * Creates a named capture group for the proceeding elements. Needs to be finalised with `.end()`. Can be later referenced with namedBackreference or backreference.
+     * @param name
+     */
+    namedCapture(name:string): SuperExpressive;
+
+    /**
      * Creates a non-capturing group of the proceeding elements. Needs to be finalised with `.end()`.
      */
     group: SuperExpressive;
+
+    /**
+     * Matches exactly what was previously matched by a namedCapture.
+     * @param name
+     */
+    namedBackreference(name:string): SuperExpressive;
+
+    /**
+     * Matches exactly what was previously matched by a capture or namedCapture using a positional index. Note regex indexes start at 1, so the first capture group has index 1.
+     * @param index
+     */
+    backreference(index:number): SuperExpressive;
 
     /**
      * Signifies the end of a SuperExpressive grouping, such as `.anyOf`, `.group`, or `.capture`.
