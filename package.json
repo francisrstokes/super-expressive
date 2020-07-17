@@ -5,12 +5,19 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha index.test.js",
-    "test:coverage": "nyc --reporter=text-summary mocha index.test.js"
+    "test:coverage": "nyc --reporter=text-summary mocha index.test.js",
+    "lint": "eslint ."
   },
   "author": "Francis Stokes <stokesie14@gmail.com>",
   "license": "MIT",
   "devDependencies": {
     "chai": "^4.2.0",
+    "eslint": "^7.4.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
     "mocha": "^8.0.1",
     "nyc": "^15.1.0"
   }
