@@ -436,7 +436,7 @@ class SuperExpressive {
     const elementValue = t.range([strA, strB]);
     const currentFrame = next[getCurrentFrame]();
 
-    currentFrame.elements.push(this[applyQuantifier](elementValue));
+    currentFrame.elements.push(next[applyQuantifier](elementValue));
 
     return next;
   }
