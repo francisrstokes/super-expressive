@@ -1,6 +1,25 @@
 // Type definitions for Super Expressive 1.0.0
 // Project: https://github.com/francisrstokes/super-expressive/
-// Definitions by: Jimmy Affatigato <https://github.com/jimmyaffatigato/>
+// Definitions by:
+//  - Jimmy Affatigato <https://github.com/jimmyaffatigato/>
+//  - Francis Stokes <https://github.com/francisrstokes/
+
+declare type SubexpressionOptions = {
+    /**
+     * Namespace to use on all named capture groups in the subexpression, to avoid naming collisions with your own named groups
+     */
+    namespace?: string;
+
+    /**
+     * If set to true, any flags this subexpression specifies should be disregarded
+     */
+    ignoreFlags?: boolean;
+
+    /**
+     * If set to true, any startOfInput/endOfInput asserted in this subexpression specifies should be disregarded
+     */
+    ignoreStartAndEnd?: boolean;
+}
 
 declare class SuperExpressive {
     /**
@@ -238,10 +257,20 @@ declare class SuperExpressive {
     range(a: string, b: string): SuperExpressive;
 
     /**
+     * Matches another SuperExpressive instance.
+     * @param {SuperExpressive} expr
+     * @param {SubexpressionOptions} opts
+     * @param {string} opts.namespace - default = ''
+     * @param {boolean} opts.ignoreFlags - default = true
+     * @param {boolean} opts.ignoreStartAndEnd - default = true
+     */
+    subexpression(expr: SuperExpressive, opts?: SubexpressionOptions): SuperExpressive;
+
+    /**
      * Outputs a string representation of the regular expression that this SuperExpression models.
      */
     toRegexString(): string;
-    
+
     /**
      * Outputs the regular expression that this SuperExpression models.
      */
