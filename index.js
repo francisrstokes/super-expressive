@@ -459,11 +459,11 @@ class SuperExpressive {
     );
 
     const pattern = this[getCurrentElementArray]().map(SuperExpressive[evaluate]).join('');
-    const flags = Object.entries(this.state.flags).map(([name, isOn]) => isOn ? name : '').join('');
+    const flags = Object.entries(this.state.flags).map(([name, isOn]) => isOn ? name : '');
 
     return {
       pattern: pattern === '' ? '(?:)' : pattern,
-      flags
+      flags: flags.sort().join('')
     };
   }
 
