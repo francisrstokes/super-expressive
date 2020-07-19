@@ -88,7 +88,7 @@ const SuperExpressive = require('super-expressive');
 
 ## Example
 
-The following example recognises and captures the value of a 16-bit hexadecmal number like `0xC0D3`.
+The following example recognises and captures the value of a 16-bit hexadecimal number like `0xC0D3`.
 
 ```javascript
 const SuperExpressive = require('super-expressive');
