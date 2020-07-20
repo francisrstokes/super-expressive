@@ -9,6 +9,7 @@
 - [Why](#Why)
 - [Installation and Usage](#Installation-and-Usage)
 - [Example](#Example)
+- [Example with Create React App](#Example-with-Create-React-App)
 - [API](#API)
   <details>
     <summary>Click to expand</summary>
@@ -108,6 +109,28 @@ const myRegex = SuperExpressive()
 
 // Produces the following regular expression:
 /^(?:0x)?([A-Fa-f0-9]{4})$/
+```
+
+## Example with Create React App
+
+```
+import SuperExpressive from 'super-expressive';
+
+const myRegex = SuperExpressive()
+  .startOfInput.optional.string('0x')
+  .capture.exactly(4)
+  .anyOf.range('A', 'F')
+  .range('a', 'f')
+  .range('0', '9')
+  .end()
+  .end()
+  .endOfInput.toRegex();
+
+function App() {
+  return <div className="App">{myRegex.toString()}</div>;
+}
+
+export default App;
 ```
 
 ## API
