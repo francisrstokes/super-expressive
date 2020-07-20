@@ -676,7 +676,7 @@ SuperExpressive()
   .endOfInput
   .toRegex();
 // ->
-/end$/
+/hello$/
 ```
 
 ### .anyOfChars(chars)
