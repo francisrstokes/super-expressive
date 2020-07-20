@@ -113,7 +113,7 @@ const myRegex = SuperExpressive()
 
 ## Example with Create React App
 
-```
+```javascript
 import SuperExpressive from 'super-expressive';
 
 const myRegex = SuperExpressive()
