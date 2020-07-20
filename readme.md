@@ -84,6 +84,9 @@ npm i super-expressive
 
 ```JavaScript
 const SuperExpressive = require('super-expressive');
+
+// Or as an ES6 module
+import SuperExpressive from 'super-expressive';
 ```
 
 ## Example
