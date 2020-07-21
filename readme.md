@@ -792,7 +792,7 @@ SuperExpressive()
   .subexpression(fiveDigits)
   .toRegex();
 // ->
-/[a-z]+.{3,}(?:\d{5})/
+/[a-z]+.{3,}\d{5}/
 ```
 
 
