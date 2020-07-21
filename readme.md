@@ -2,7 +2,7 @@
 
 ![Super Expressive Logo](./logo.png)
 
-**Super Expressive** is a JavaScript library that allows you to build regular expressions in almost natural language - with no extra dependencies, and a lightweight code footprint (less than 3kb with minification + gzip!).
+**Super Expressive** is a JavaScript library that allows you to build regular expressions in almost natural language - with no extra dependencies, and a lightweight code footprint (less than 4kb with minification + gzip!).
 
 ---
 
@@ -60,6 +60,7 @@
   - [.string(s)](#string(s))
   - [.char(c)](#char(c))
   - [.range(a, b)](#range(a,-b))
+  - [.subexpression(expr, opts)](#subexpression(expr,-opts))
   - [.toRegexString()](#toRegexString())
   - [.toRegex()](#toRegex())
   </details>
@@ -769,6 +770,29 @@ SuperExpressive()
 // ->
 /[a-z]/
 ```
+
+### .subexpression(expr, opts?)
+
+- *opts.namespace*: A **string** namespace to use on all named capture groups in the subexpression, to avoid naming collisions with your own named groups (default = `''`)
+- *opts.ignoreFlags*: If set to true, any flags this subexpression specifies should be disregarded (default = `true`)
+- *opts.ignoreStartAndEnd*: If set to true, any startOfInput/endOfInput asserted in this subexpression specifies should be disregarded (default = `true`)
+
+Matches another SuperExpressive instance inline. Can be used to create libraries, or to modularise you code. By default, flags and start/end of input markers are ignored, but can be explcitly turned on in the options object.
+
+**Example**
+```JavaScript
+// A reusable SuperExpressive...
+const fiveDigits = SuperExpressive().exactly(5).digit;
+
+SuperExpressive()
+  .oneOrMore.range('a', 'z')
+  .atLeast(3).anyChar
+  .subexpression(fiveDigits)
+  .toRegex();
+// ->
+/[a-z]+.{3,}(?:\d{5})/
+```
+
 
 ### .toRegexString()
 

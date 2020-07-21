@@ -44,22 +44,24 @@ const quantifierTable = {
   betweenLazy: metadata => `{${metadata[0]},${metadata[1]}}?`,
 }
 
+const applySubexpressionDefaults = expr => {
+  const out = { ...expr };
+  out.namespace = ('namespace' in out) ? out.namespace : '';
+  out.ignoreFlags = ('ignoreFlags' in out) ? out.ignoreFlags : true;
+  out.ignoreStartAndEnd = ('ignoreStartAndEnd' in out) ? out.ignoreStartAndEnd : true;
+
+  assert(typeof out.namespace === 'string', 'namespace must be a string');
+  assert(typeof out.ignoreFlags === 'boolean', 'ignoreFlags must be a boolean');
+  assert(typeof out.ignoreStartAndEnd === 'boolean', 'ignoreStartAndEnd must be a boolean');
+
+  return out;
+}
+
 const t = {
   root: asType('root') (),
+  noop: asType('noop') (),
   startOfInput: asType('startOfInput') (),
   endOfInput: asType('endOfInput') (),
-  capture: deferredType('capture'),
-  namedCapture: name => deferredType('namedCapture', { metadata: name }),
-  namedBackreference: name => deferredType('namedBackreference', { metadata: name }),
-  backreference: index => deferredType('backreference', { metadata: index }),
-  group: deferredType('group'),
-  anyOf: deferredType('anyOf'),
-  assertAhead: deferredType('assertAhead'),
-  assertNotAhead: deferredType('assertNotAhead'),
-  exactly: times => deferredType('exactly', { metadata: times }),
-  atLeast: times => deferredType('atLeast', { metadata: times }),
-  between: (x, y) => deferredType('between', { metadata: [x, y] }),
-  betweenLazy: (x, y) => deferredType('betweenLazy', { metadata: [x, y] }),
   anyChar: asType('anyChar') (),
   whitespaceChar: asType('whitespaceChar') (),
   nonWhitespaceChar: asType('nonWhitespaceChar') (),
@@ -73,18 +75,31 @@ const t = {
   carriageReturn: asType('carriageReturn') (),
   tab: asType('tab') (),
   nullByte: asType('nullByte') (),
-  string: asType('string', { quantifierRequiresGroup: true }),
   anyOfChars: asType('anyOfChars'),
   anythingButString: asType('anythingButString'),
   anythingButChars: asType('anythingButChars'),
   anythingButRange: asType('anythingButRange'),
   char: asType('char'),
   range: asType('range'),
-  zeroOrMore: deferredType('zeroOrMore'),
-  zeroOrMoreLazy: deferredType('zeroOrMoreLazy'),
-  oneOrMore: deferredType('oneOrMore'),
-  oneOrMoreLazy: deferredType('oneOrMoreLazy'),
-  optional: deferredType('optional'),
+  string: asType('string', { quantifierRequiresGroup: true }),
+  namedBackreference: name => deferredType('namedBackreference', { metadata: name }),
+  backreference: index => deferredType('backreference', { metadata: index }),
+  capture: deferredType('capture', { containsChildren: true }),
+  subexpression: asType('subexpression', { containsChildren: true, quantifierRequiresGroup: true }),
+  namedCapture: name => deferredType('namedCapture', { metadata: name, containsChildren: true }),
+  group: deferredType('group', { containsChildren: true }),
+  anyOf: deferredType('anyOf', { containsChildren: true }),
+  assertAhead: deferredType('assertAhead', { containsChildren: true }),
+  assertNotAhead: deferredType('assertNotAhead', { containsChildren: true }),
+  exactly: times => deferredType('exactly', { metadata: times, containsChild: true }),
+  atLeast: times => deferredType('atLeast', { metadata: times, containsChild: true }),
+  between: (x, y) => deferredType('between', { metadata: [x, y], containsChild: true }),
+  betweenLazy: (x, y) => deferredType('betweenLazy', { metadata: [x, y], containsChild: true }),
+  zeroOrMore: deferredType('zeroOrMore', { containsChild: true }),
+  zeroOrMoreLazy: deferredType('zeroOrMoreLazy', { containsChild: true }),
+  oneOrMore: deferredType('oneOrMore', { containsChild: true }),
+  oneOrMoreLazy: deferredType('oneOrMoreLazy', { containsChild: true }),
+  optional: deferredType('optional', { containsChild: true }),
 }
 
 const isFusable = element => {
@@ -121,6 +136,8 @@ const getRegexPatternAndFlags = Symbol('getRegexBody');
 const matchElement = Symbol('matchElement');
 const frameCreatingElement = Symbol('frameCreatingElement');
 const quantifierElement = Symbol('quantifierElement');
+const mergeSubexpression = Symbol('mergeSubexpression');
+const trackNamedGroup = Symbol('trackNamedGroup');
 
 class SuperExpressive {
   constructor() {
@@ -235,15 +252,19 @@ class SuperExpressive {
     return next;
   }
 
-  namedCapture(name) {
+  [trackNamedGroup](name) {
     assert(typeof name === 'string', `name must be a string (got ${name})`);
     assert(name.length > 0, `name must be at least one character`);
     assert(!this.state.namedGroups.includes(name), `cannot use ${name} again for a capture group`);
-    assert(namedGroupRegex.test(name), `name is not valid (only letters, numbers, and underscores)`);
+    assert(namedGroupRegex.test(name), `name "${name}" is not valid (only letters, numbers, and underscores)`);
+    this.state.namedGroups.push(name);
+  }
 
+  namedCapture(name) {
     const next = this[clone]();
     const newFrame = createStackFrame(t.namedCapture(name));
-    next.state.namedGroups.push(name);
+
+    next[trackNamedGroup](name);
     next.state.stack.push(newFrame);
     next.state.totalCaptureGroups++;
     return next;
@@ -436,7 +457,126 @@ class SuperExpressive {
     const elementValue = t.range([strA, strB]);
     const currentFrame = next[getCurrentFrame]();
 
-    currentFrame.elements.push(this[applyQuantifier](elementValue));
+    currentFrame.elements.push(next[applyQuantifier](elementValue));
+
+    return next;
+  }
+
+  static [mergeSubexpression](el, options, parent, incrementCaptureGroups) {
+    let nextEl = deepCopy(el);
+
+    if (nextEl.type === 'backreference') {
+      nextEl.metadata += parent.state.totalCaptureGroups;
+    }
+
+    if (nextEl.type === 'capture') {
+      incrementCaptureGroups();
+    }
+
+    if (nextEl.type === 'namedCapture') {
+      const groupName = options.namespace
+        ? `${options.namespace}${nextEl.metadata}`
+        : nextEl.metadata;
+
+      parent[trackNamedGroup](groupName);
+      nextEl.metadata = groupName;
+    }
+
+    if (nextEl.type === 'namedBackreference') {
+      nextEl.metadata = options.namespace
+        ? `${options.namespace}${nextEl.metadata}`
+        : nextEl.metadata;
+    }
+
+    if (nextEl.containsChild) {
+      nextEl.value = SuperExpressive[mergeSubexpression](
+        nextEl.value,
+        options,
+        parent,
+        incrementCaptureGroups
+      );
+    } else if (nextEl.containsChildren) {
+      nextEl.value = nextEl.value.map(e =>
+        SuperExpressive[mergeSubexpression](
+          e,
+          options,
+          parent,
+          incrementCaptureGroups
+        )
+      );
+    }
+
+    if (nextEl.type === 'startOfInput') {
+      if (options.ignoreStartAndEnd) {
+        return t.noop;
+      }
+
+      assert(
+        !parent.state.hasDefinedStart,
+        'The parent regex already has a defined start of input. ' +
+        'You can ignore a subexpressions startOfInput/endOfInput markers with the ignoreStartAndEnd option'
+      );
+
+      assert(
+        !parent.state.hasDefinedEnd,
+        'The parent regex already has a defined end of input. ' +
+        'You can ignore a subexpressions startOfInput/endOfInput markers with the ignoreStartAndEnd option'
+      );
+
+      parent.state.hasDefinedStart = true;
+    }
+
+    if (nextEl.type === 'endOfInput') {
+      if (options.ignoreStartAndEnd) {
+        return t.noop;
+      }
+
+      assert(
+        !parent.state.hasDefinedEnd,
+        'The parent regex already has a defined start of input. ' +
+        'You can ignore a subexpressions startOfInput/endOfInput markers with the ignoreStartAndEnd option'
+      );
+
+      parent.state.hasDefinedEnd = true;
+    }
+
+    return nextEl;
+  }
+
+  subexpression(expr, opts = {}) {
+    assert(expr instanceof SuperExpressive, `expr must be a SuperExpressive instance`);
+    assert(
+      expr.state.stack.length === 1,
+      'Cannot call subexpression with a not yet fully specified regex object.' +
+      `\n(Try adding a .end() call to match the "${expr[getCurrentFrame]().type.type}" on the subexpression)\n`
+    );
+
+    const options = applySubexpressionDefaults(opts);
+
+    const exprNext = expr[clone]();
+    const next = this[clone]();
+    let additionalCaptureGroups = 0;
+
+    const exprFrame = exprNext[getCurrentFrame]();
+    exprFrame.elements = exprFrame.elements.map(e =>
+      SuperExpressive[mergeSubexpression](
+        e,
+        options,
+        next,
+        () => additionalCaptureGroups++
+      )
+    );
+
+    next.state.totalCaptureGroups += additionalCaptureGroups;
+
+    if (!options.ignoreFlags) {
+      Object.entries(exprNext.state.flags).forEach(([flagName, enabled]) => {
+        next.state.flags[flagName] = enabled || next.state.flags[flagName];
+      });
+    }
+
+    const currentFrame = next[getCurrentFrame]();
+    currentFrame.elements.push(next[applyQuantifier](t.subexpression(exprFrame.elements)));
 
     return next;
   }
@@ -459,11 +599,11 @@ class SuperExpressive {
     );
 
     const pattern = this[getCurrentElementArray]().map(SuperExpressive[evaluate]).join('');
-    const flags = Object.entries(this.state.flags).map(([name, isOn]) => isOn ? name : '').join('');
+    const flags = Object.entries(this.state.flags).map(([name, isOn]) => isOn ? name : '');
 
     return {
       pattern: pattern === '' ? '(?:)' : pattern,
-      flags
+      flags: flags.sort().join('')
     };
   }
 
@@ -493,6 +633,7 @@ class SuperExpressive {
 
   static [evaluate](el) {
     switch (el.type) {
+      case 'noop': return '';
       case 'anyChar': return '.';
       case 'whitespaceChar': return '\\s';
       case 'nonWhitespaceChar': return '\\S';
@@ -516,6 +657,7 @@ class SuperExpressive {
       case 'anythingButChars': return `[^${el.value}]`;
       case 'namedBackreference': return `\\k<${el.metadata}>`;
       case 'backreference': return `\\${el.metadata}`;
+      case 'subexpression': return el.value.map(SuperExpressive[evaluate]).join('');
 
       case 'optional':
       case 'zeroOrMore':
