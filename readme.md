@@ -13,7 +13,7 @@
   <details>
     <summary>Click to expand</summary>
 
-  - [SuperExpressive()](#SuperExpressive())
+  - [SuperExpressive()](#SuperExpressive)
   - [.allowMultipleMatches](#allowMultipleMatches)
   - [.lineByLine](#lineByLine)
   - [.caseInsensitive](#caseInsensitive)
@@ -35,9 +35,9 @@
   - [.nullByte](#nullByte)
   - [.anyOf](#anyOf)
   - [.capture](#capture)
-  - [.namedCapture(name)](#namedCapture(name))
-  - [.backreference(index)](#backreference(index))
-  - [.namedBackreference(index)](#namedBackreference(index))
+  - [.namedCapture(name)](#namedCapturename)
+  - [.backreference(index)](#backreferenceindex)
+  - [.namedBackreference(index)](#namedBackreferenceindex)
   - [.group](#group)
   - [.end()](#end())
   - [.assertAhead](#assertAhead)
@@ -47,22 +47,22 @@
   - [.zeroOrMoreLazy](#zeroOrMoreLazy)
   - [.oneOrMore](#oneOrMore)
   - [.oneOrMoreLazy](#oneOrMoreLazy)
-  - [.exactly(n)](#exactly(n))
-  - [.atLeast(n)](#atLeast(n))
-  - [.between(x, y)](#between(x,-y))
-  - [.betweenLazy(x, y)](#betweenLazy(x,-y))
+  - [.exactly(n)](#exactlyn)
+  - [.atLeast(n)](#atLeastn)
+  - [.between(x, y)](#betweenx-y)
+  - [.betweenLazy(x, y)](#betweenLazyx-y)
   - [.startOfInput](#startOfInput)
   - [.endOfInput](#endOfInput)
-  - [.anyOfChars(chars)](#anyOfChars(chars))
-  - [.anythingButChars(chars)](#anythingButChars(chars))
-  - [.anythingButString(str)](#anythingButString(str))
-  - [.anythingButRange(a, b)](#anythingButRange(a,-b))
-  - [.string(s)](#string(s))
-  - [.char(c)](#char(c))
-  - [.range(a, b)](#range(a,-b))
-  - [.subexpression(expr, opts)](#subexpression(expr,-opts))
-  - [.toRegexString()](#toRegexString())
-  - [.toRegex()](#toRegex())
+  - [.anyOfChars(chars)](#anyOfCharschars)
+  - [.anythingButChars(chars)](#anythingButCharschars)
+  - [.anythingButString(str)](#anythingButStringstr)
+  - [.anythingButRange(a, b)](#anythingButRangea-b)
+  - [.string(s)](#strings)
+  - [.char(c)](#charc)
+  - [.range(a, b)](#rangea-b)
+  - [.subexpression(expr, opts)](#subexpressionexpr-opts)
+  - [.toRegexString()](#toRegexString)
+  - [.toRegex()](#toRegex)
   </details>
 
 ## Why?
@@ -74,6 +74,8 @@ That's where **Super Expressive** comes in. It provides a programmatic and human
 - properties and methods describe what they do in plain English
 - order matters! quantifiers are specified before the thing they change, just like in English (e.g. `SuperExpressive().exactly(5).digit`)
 - if you make a mistake, you'll know how to fix it. SuperExpressive will guide you towards a fix if your expression is invalid
+- [subexpressions](#subexpressionexpr-opts) can be used to create meaningful, reusable components
+- includes an `index.d.ts` file for full TypeScript support
 
 SuperExpressive turns those complex and unweildy regexes that appear in code reviews into something that can be read, understood, and **properly reviewed** by your peers - and maintained by anyone!
 
@@ -397,7 +399,7 @@ SuperExpressive()
 
 ### .capture
 
-Creates a capture group for the proceeding elements. Needs to be finalised with `.end()`. Can be later referenced with [backreference(index)](#backreference(index)).
+Creates a capture group for the proceeding elements. Needs to be finalised with `.end()`. Can be later referenced with [backreference(index)](#backreferenceindex).
 
 **Example**
 ```JavaScript
@@ -414,7 +416,7 @@ SuperExpressive()
 
 ### .namedCapture(name)
 
-Creates a named capture group for the proceeding elements. Needs to be finalised with `.end()`. Can be later referenced with [namedBackreference(name)](#namedBackreference(name)) or [backreference(index)](#backreference(index)).
+Creates a named capture group for the proceeding elements. Needs to be finalised with `.end()`. Can be later referenced with [namedBackreference(name)](#namedBackreferencename) or [backreference(index)](#backreferenceindex).
 
 **Example**
 ```JavaScript
@@ -431,7 +433,7 @@ SuperExpressive()
 
 ### .namedBackreference(name)
 
-Matches exactly what was previously matched by a [namedCapture](#namedCapture(name)).
+Matches exactly what was previously matched by a [namedCapture](#namedCapturename).
 
 **Example**
 ```JavaScript
@@ -450,7 +452,7 @@ SuperExpressive()
 
 ### .backreference(index)
 
-Matches exactly what was previously matched by a [capture](#capture) or [namedCapture](#namedCapture(name)) using a positional index. Note regex indexes start at 1, so the first capture group has index 1.
+Matches exactly what was previously matched by a [capture](#capture) or [namedCapture](#namedCapturename) using a positional index. Note regex indexes start at 1, so the first capture group has index 1.
 
 **Example**
 ```JavaScript
@@ -721,7 +723,7 @@ SuperExpressive()
 
 ### .anythingButRange(a, b)
 
-Matches any character, except those that would be captured by the [.range](#range(a,-b)) specified by `a` and `b`.
+Matches any character, except those that would be captured by the [.range](#rangea-b) specified by `a` and `b`.
 
 **Example**
 ```JavaScript
@@ -790,7 +792,7 @@ SuperExpressive()
   .subexpression(fiveDigits)
   .toRegex();
 // ->
-/[a-z]+.{3,}(?:\d{5})/
+/[a-z]+.{3,}\d{5}/
 ```
 
 
