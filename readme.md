@@ -75,6 +75,7 @@ That's where **Super Expressive** comes in. It provides a programmatic and human
 - order matters! quantifiers are specified before the thing they change, just like in English (e.g. `SuperExpressive().exactly(5).digit`)
 - if you make a mistake, you'll know how to fix it. SuperExpressive will guide you towards a fix if your expression is invalid
 - [subexpressions](#subexpressionexpr-opts) can be used to create meaningful, reusable components
+- includes an `index.d.ts` file for full TypeScript support
 
 SuperExpressive turns those complex and unweildy regexes that appear in code reviews into something that can be read, understood, and **properly reviewed** by your peers - and maintained by anyone!
 
