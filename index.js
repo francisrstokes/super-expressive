@@ -38,10 +38,10 @@ const quantifierTable = {
   zeroOrMore: '*',
   zeroOrMoreLazy: '*?',
   optional: '?',
-  exactly: metadata => `{${metadata}}`,
-  atLeast: metadata => `{${metadata},}`,
-  between: metadata => `{${metadata[0]},${metadata[1]}}`,
-  betweenLazy: metadata => `{${metadata[0]},${metadata[1]}}?`,
+  exactly: times => `{${times}}`,
+  atLeast: times => `{${times},}`,
+  between: times => `{${times[0]},${times[1]}}`,
+  betweenLazy: times => `{${times[0]},${times[1]}}?`,
 }
 
 const applySubexpressionDefaults = expr => {
@@ -82,19 +82,19 @@ const t = {
   char: asType('char'),
   range: asType('range'),
   string: asType('string', { quantifierRequiresGroup: true }),
-  namedBackreference: name => deferredType('namedBackreference', { metadata: name }),
-  backreference: index => deferredType('backreference', { metadata: index }),
+  namedBackreference: name => deferredType('namedBackreference', { name }),
+  backreference: index => deferredType('backreference', { index }),
   capture: deferredType('capture', { containsChildren: true }),
   subexpression: asType('subexpression', { containsChildren: true, quantifierRequiresGroup: true }),
-  namedCapture: name => deferredType('namedCapture', { metadata: name, containsChildren: true }),
+  namedCapture: name => deferredType('namedCapture', { name, containsChildren: true }),
   group: deferredType('group', { containsChildren: true }),
   anyOf: deferredType('anyOf', { containsChildren: true }),
   assertAhead: deferredType('assertAhead', { containsChildren: true }),
   assertNotAhead: deferredType('assertNotAhead', { containsChildren: true }),
-  exactly: times => deferredType('exactly', { metadata: times, containsChild: true }),
-  atLeast: times => deferredType('atLeast', { metadata: times, containsChild: true }),
-  between: (x, y) => deferredType('between', { metadata: [x, y], containsChild: true }),
-  betweenLazy: (x, y) => deferredType('betweenLazy', { metadata: [x, y], containsChild: true }),
+  exactly: times => deferredType('exactly', { times, containsChild: true }),
+  atLeast: times => deferredType('atLeast', { times, containsChild: true }),
+  between: (x, y) => deferredType('between', { times: [x, y], containsChild: true }),
+  betweenLazy: (x, y) => deferredType('betweenLazy', { times: [x, y], containsChild: true }),
   zeroOrMore: deferredType('zeroOrMore', { containsChild: true }),
   zeroOrMoreLazy: deferredType('zeroOrMoreLazy', { containsChild: true }),
   oneOrMore: deferredType('oneOrMore', { containsChild: true }),
@@ -466,7 +466,7 @@ class SuperExpressive {
     let nextEl = deepCopy(el);
 
     if (nextEl.type === 'backreference') {
-      nextEl.metadata += parent.state.totalCaptureGroups;
+      nextEl.index += parent.state.totalCaptureGroups;
     }
 
     if (nextEl.type === 'capture') {
@@ -475,17 +475,17 @@ class SuperExpressive {
 
     if (nextEl.type === 'namedCapture') {
       const groupName = options.namespace
-        ? `${options.namespace}${nextEl.metadata}`
-        : nextEl.metadata;
+        ? `${options.namespace}${nextEl.name}`
+        : nextEl.name;
 
       parent[trackNamedGroup](groupName);
-      nextEl.metadata = groupName;
+      nextEl.name = groupName;
     }
 
     if (nextEl.type === 'namedBackreference') {
-      nextEl.metadata = options.namespace
-        ? `${options.namespace}${nextEl.metadata}`
-        : nextEl.metadata;
+      nextEl.name = options.namespace
+        ? `${options.namespace}${nextEl.name}`
+        : nextEl.name;
     }
 
     if (nextEl.containsChild) {
@@ -655,8 +655,8 @@ class SuperExpressive {
       case 'anythingButRange': return `[^${el.value[0]}-${el.value[1]}]`;
       case 'anyOfChars': return `[${el.value}]`;
       case 'anythingButChars': return `[^${el.value}]`;
-      case 'namedBackreference': return `\\k<${el.metadata}>`;
-      case 'backreference': return `\\${el.metadata}`;
+      case 'namedBackreference': return `\\k<${el.name}>`;
+      case 'backreference': return `\\${el.index}`;
       case 'subexpression': return el.value.map(SuperExpressive[evaluate]).join('');
 
       case 'optional':
@@ -680,7 +680,7 @@ class SuperExpressive {
         const withGroup = el.value.quantifierRequiresGroup
           ? `(?:${inner})`
           : inner;
-        return `${withGroup}${quantifierTable[el.type](el.metadata)}`;
+        return `${withGroup}${quantifierTable[el.type](el.times)}`;
       }
 
       case 'anythingButString': {
@@ -717,7 +717,7 @@ class SuperExpressive {
 
       case 'namedCapture': {
         const evaluated = el.value.map(SuperExpressive[evaluate]);
-        return `(?<${el.metadata}>${evaluated.join('')})`;
+        return `(?<${el.name}>${evaluated.join('')})`;
       }
 
       case 'group': {
