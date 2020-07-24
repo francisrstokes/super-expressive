@@ -1,3 +1,9 @@
+const assert = (condition, message) => {
+  if (!condition) {
+    throw new Error(message);
+  }
+};
+
 const asType = (type, opts = {}) => value => ({ type, value, ...opts });
 const deferredType = (type, opts = {}) => {
   const typeFn = asType (type, opts);
@@ -119,12 +125,6 @@ const fuseElements = elements => {
 }
 
 const createStackFrame = type => ({ type, quantifier: null, elements: [] });
-
-const assert = (condition, message) => {
-  if (!condition) {
-    throw new Error(message);
-  }
-};
 
 // Symbols are used to create private methods
 const clone = Symbol('clone');
@@ -349,9 +349,8 @@ class SuperExpressive {
   }
 
   get endOfInput() {
-    if (this.state.hasDefinedEnd) {
-      throw new Error('This regex already has a defined end of input');
-    }
+    assert(!this.state.hasDefinedEnd, 'This regex already has a defined end of input');
+
     const next = this[clone]();
     next.state.hasDefinedEnd = true;
     next[getCurrentElementArray]().push(t.endOfInput);
@@ -370,11 +369,9 @@ class SuperExpressive {
   }
 
   end() {
-    const next = this[clone]();
-    if (next.state.stack.length === 1) {
-      throw new Error(`Cannot call end while building the root expression.`);
-    }
+    assert(this.state.stack.length > 1, 'Cannot call end while building the root expression.');
 
+    const next = this[clone]();
     const oldFrame = next.state.stack.pop();
     const currentFrame = next[getCurrentFrame]();
     currentFrame.elements.push(next[applyQuantifier](oldFrame.type.value(oldFrame.elements)));
