@@ -3,3 +3,5 @@ test.js
 index.test.js
 .github/
 .vscode/
+*.png
+*.jpg
