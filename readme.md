@@ -9,6 +9,7 @@
 - [Why](#Why)
 - [Installation and Usage](#Installation-and-Usage)
 - [Example](#Example)
+- [Playground](#Playground)
 - [API](#API)
   <details>
     <summary>Click to expand</summary>
@@ -115,6 +116,14 @@ const myRegex = SuperExpressive()
 // Produces the following regular expression:
 /^(?:0x)?([A-Fa-f0-9]{4})$/
 ```
+
+## Playground
+
+You can experiment with `SuperExpressive` in the [Super Expressive Playground](https://sepg.netlify.app/) by [@nartc](https://github.com/nartc). This is a great way to build a regex description, and test it against various inputs.
+
+<img src="playground-small.jpg">
+
+
 
 ## API
 
