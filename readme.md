@@ -78,7 +78,7 @@ That's where **Super Expressive** comes in. It provides a programmatic and human
 - [subexpressions](#subexpressionexpr-opts) can be used to create meaningful, reusable components
 - includes an `index.d.ts` file for full TypeScript support
 
-SuperExpressive turns those complex and unweildy regexes that appear in code reviews into something that can be read, understood, and **properly reviewed** by your peers - and maintained by anyone!
+SuperExpressive turns those complex and unwieldy regexes that appear in code reviews into something that can be read, understood, and **properly reviewed** by your peers - and maintained by anyone!
 
 ## Installation and Usage
 
