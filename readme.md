@@ -10,6 +10,7 @@
 - [Installation and Usage](#Installation-and-Usage)
 - [Example](#Example)
 - [Playground](#Playground)
+- [Ports](#Ports)
 - [API](#API)
   <details>
     <summary>Click to expand</summary>
@@ -123,7 +124,13 @@ You can experiment with `SuperExpressive` in the [Super Expressive Playground](h
 
 <img src="playground-small.jpg">
 
+## Ports
 
+Super Expressive has been ported to the following langauges:
+
+### PHP
+
+https://github.com/bassim/super-expressive-php by <a href="https://github.com/bassim/">@bassim</a>
 
 ## API
 
