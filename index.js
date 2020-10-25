@@ -97,6 +97,8 @@ const t = {
   anyOf: deferredType('anyOf', { containsChildren: true }),
   assertAhead: deferredType('assertAhead', { containsChildren: true }),
   assertNotAhead: deferredType('assertNotAhead', { containsChildren: true }),
+  assertBehind: deferredType('assertBehind', { containsChildren: true }),
+  assertNotBehind: deferredType('assertNotBehind', { containsChildren: true }),
   exactly: times => deferredType('exactly', { times, containsChild: true }),
   atLeast: times => deferredType('atLeast', { times, containsChild: true }),
   between: (x, y) => deferredType('between', { times: [x, y], containsChild: true }),
@@ -243,6 +245,8 @@ class SuperExpressive {
   get group() { return this[frameCreatingElement](t.group); }
   get assertAhead() { return this[frameCreatingElement](t.assertAhead); }
   get assertNotAhead() { return this[frameCreatingElement](t.assertNotAhead); }
+  get assertBehind() { return this[frameCreatingElement](t.assertBehind); }
+  get assertNotBehind() { return this[frameCreatingElement](t.assertNotBehind); }
 
   get capture() {
     const next = this[clone]();
@@ -690,9 +694,19 @@ class SuperExpressive {
         return `(?=${evaluated})`;
       }
 
+      case 'assertBehind': {
+        const evaluated = el.value.map(SuperExpressive[evaluate]).join('');
+        return `(?<=${evaluated})`;
+      }
+
       case 'assertNotAhead': {
         const evaluated = el.value.map(SuperExpressive[evaluate]).join('');
         return `(?!${evaluated})`;
+      }
+
+      case 'assertNotBehind': {
+        const evaluated = el.value.map(SuperExpressive[evaluate]).join('');
+        return `(?<!${evaluated})`;
       }
 
       case 'anyOf': {

@@ -197,6 +197,16 @@ describe('SuperExpressive', () => {
   );
 
   testRegexEquality(
+    'assertBehind',
+    /(?<=hello )[a-z]/,
+    SuperExpressive()
+      .assertBehind
+        .string('hello ')
+      .end()
+      .range('a', 'z')
+  );
+
+  testRegexEquality(
     'assertNotAhead',
     /(?![a-f])[0-9]/,
     SuperExpressive()
@@ -204,6 +214,16 @@ describe('SuperExpressive', () => {
         .range('a', 'f')
       .end()
       .range('0', '9')
+  );
+
+  testRegexEquality(
+    'assertNotBehind',
+    /(?<!hello )[a-z]/,
+    SuperExpressive()
+      .assertNotBehind
+        .string('hello ')
+      .end()
+      .range('a', 'z')
   );
 
   testRegexEquality('optional', /\w?/, SuperExpressive().optional.word);

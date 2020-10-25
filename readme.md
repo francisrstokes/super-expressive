@@ -44,6 +44,8 @@
   - [.end()](#end())
   - [.assertAhead](#assertAhead)
   - [.assertNotAhead](#assertNotAhead)
+  - [.assertBehind](#assertBehind)
+  - [.assertNotBehind](#assertNotBehind)
   - [.optional](#optional)
   - [.zeroOrMore](#zeroOrMore)
   - [.zeroOrMoreLazy](#zeroOrMoreLazy)
@@ -551,6 +553,38 @@ SuperExpressive()
   .toRegex();
 // ->
 /(?![a-f])[g-z]/
+```
+
+### .assertBehind
+
+Assert that the elements contained within **are** found immediately before this point in the string. Needs to be finalised with `.end()`.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .assertBehind
+    .string('hello ')
+  .end()
+  .string('world')
+  .toRegex();
+// ->
+/(?<=hello )world/
+```
+
+### .assertNotBehind
+
+Assert that the elements contained within are **not** found immediately before this point in the string. Needs to be finalised with `.end()`.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .assertNotBehind
+    .string('hello ')
+  .end()
+  .string('world')
+  .toRegex();
+// ->
+/(?<!hello )world/
 ```
 
 ### .optional
