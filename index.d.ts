@@ -166,6 +166,16 @@ declare class SuperExpressive {
     assertNotAhead: SuperExpressive;
 
     /**
+     * Assert that the elements contained within are found immediately before this point in the string. Needs to be finalised with `.end()`.
+     */
+    assertBehind: SuperExpressive;
+
+    /**
+     * Assert that the elements contained within are not found immediately before this point in the string. Needs to be finalised with `.end()`.
+     */
+    assertNotBehind: SuperExpressive;
+
+    /**
      * Assert that the proceeding element may or may not be matched.
      */
     optional: SuperExpressive;
