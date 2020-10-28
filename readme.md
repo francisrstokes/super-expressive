@@ -134,6 +134,10 @@ Super Expressive has been ported to the following langauges:
 
 https://github.com/bassim/super-expressive-php by <a href="https://github.com/bassim/">@bassim</a>
 
+### Ruby
+
+https://github.com/hiy/super-expressive-ruby by <a href="https://github.com/hiy">@hiy</a>
+
 ## API
 
 ### SuperExpressive()
