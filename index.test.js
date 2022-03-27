@@ -242,6 +242,7 @@ describe('SuperExpressive', () => {
   testRegexEquality('anythingButChars', /[^aeiou\.\-]/, SuperExpressive().anythingButChars('aeiou.-'));
   testRegexEquality('anythingButRange', /[^0-9]/, SuperExpressive().anythingButRange('0', '9'));
   testRegexEquality('string', /hello/, SuperExpressive().string('hello'));
+  testRegexEquality('string escapes special characters with strings of length 1', /\^hello/ ,SuperExpressive().string('^').string('hello'))
   testRegexEquality('char', /h/, SuperExpressive().string('h'));
   testErrorConditition(
     'char: more than one',
