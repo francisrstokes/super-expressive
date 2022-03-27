@@ -427,7 +427,7 @@ class SuperExpressive {
     assert(s.length >= 0, `s cannot be an empty string`);
 
     const next = this[clone]();
-    const elementValue = s.length > 1 ? t.string(escapeSpecial(s)) : t.char(s);
+    const elementValue = s.length > 1 ? t.string(escapeSpecial(s)) : t.char(escapeSpecial(s));
     const currentFrame = next[getCurrentFrame]();
     currentFrame.elements.push(next[applyQuantifier](elementValue));
 
