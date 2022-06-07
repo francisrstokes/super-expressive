@@ -128,7 +128,7 @@ You can experiment with `SuperExpressive` in the [Super Expressive Playground](h
 
 ## Ports
 
-Super Expressive has been ported to the following langauges:
+Super Expressive has been ported to the following languages:
 
 ### PHP
 
