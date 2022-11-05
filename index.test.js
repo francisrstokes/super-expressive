@@ -243,7 +243,12 @@ describe('SuperExpressive', () => {
   testRegexEquality('anythingButRange', /[^0-9]/, SuperExpressive().anythingButRange('0', '9'));
   testRegexEquality('string', /hello/, SuperExpressive().string('hello'));
   testRegexEquality('string escapes special characters with strings of length 1', /\^hello/ ,SuperExpressive().string('^').string('hello'))
-  testRegexEquality('char', /h/, SuperExpressive().string('h'));
+  testErrorConditition(
+    'string: zero characters',
+    's cannot be an empty string',
+    () => SuperExpressive().string('')
+  );
+  testRegexEquality('char', /h/, SuperExpressive().char('h'));
   testErrorConditition(
     'char: more than one',
     'char() can only be called with a single character (got hello)',
