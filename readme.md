@@ -138,6 +138,10 @@ https://github.com/bassim/super-expressive-php by <a href="https://github.com/ba
 
 https://github.com/hiy/super-expressive-ruby by <a href="https://github.com/hiy">@hiy</a>
 
+### Python
+
+https://github.com/stanislav-tsaplev/super_expressive by <a href="https://github.com/stanislav-tsaplev">@stanislav-tsaplev</a>
+
 ## API
 
 ### SuperExpressive()
