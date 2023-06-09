@@ -46,7 +46,7 @@ describe('SuperExpressive', () => {
 
   testRegexEquality(
     'anyOf: basic',
-    /(?:hello|\d|\w|[\.#])/,
+    /(?:hello|[\d\w\.#])/,
     SuperExpressive()
       .anyOf
         .string('hello')
