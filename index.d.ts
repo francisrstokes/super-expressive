@@ -277,6 +277,11 @@ declare class SuperExpressive {
     char(c: string): SuperExpressive;
 
     /**
+     * Matches a control code for the latin character `c`.
+     */
+    controlChar(c: string): SuperExpressive;
+
+    /**
      * Matches any character that falls between `a` and `b`. Ordering is defined by a characters ASCII or unicode value.
      */
     range(a: string, b: string): SuperExpressive;

@@ -37,6 +37,7 @@ const replaceAll = (s, find, replace) => s.replace(new RegExp(`\\${find}`, 'g'),
 const escapeSpecial = s => specialChars.reduce((acc, char) => replaceAll(acc, char, `\\${char}`), s);
 
 const namedGroupRegex = /^[a-z]+\w*$/i;
+const controlCharRegex = /^[a-z]$/i;
 
 const quantifierTable = {
   oneOrMore: '+',
@@ -91,6 +92,7 @@ const t = {
   char: asType('char', { classCompatible: true }),
   range: asType('range', { classCompatible: true }),
   string: asType('string', { quantifierRequiresGroup: true }),
+  controlChar: asType('controlChar', { classCompatible: true }),
   namedBackreference: name => deferredType('namedBackreference', { name }),
   backreference: index => deferredType('backreference', { index }),
   capture: deferredType('capture', { containsChildren: true }),
@@ -454,6 +456,17 @@ class SuperExpressive {
     return next;
   }
 
+  controlChar(c) {
+    assert(typeof c === 'string', `c must be a string (got ${c})`);
+    assert(controlCharRegex.test(c), `controlChar() can only be called with a single character from a-z (got ${c})`);
+
+    const next = this[clone]();
+    const currentFrame = next[getCurrentFrame]();
+    currentFrame.elements.push(next[applyQuantifier](t.controlChar(c.toUpperCase())));
+
+    return next;
+  }
+
   range(a, b) {
     const strA = a.toString();
     const strB = b.toString();
@@ -664,6 +677,7 @@ class SuperExpressive {
       case 'nullByte': return '\\0';
       case 'string': return el.value;
       case 'char': return el.value;
+      case 'controlChar': return `\\c${el.value}`;
       case 'range': return `[${el.value[0]}-${el.value[1]}]`;
       case 'anythingButRange': return `[^${el.value[0]}-${el.value[1]}]`;
       case 'anyOfChars': return `[${el.value}]`;

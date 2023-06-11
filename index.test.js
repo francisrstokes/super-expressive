@@ -259,6 +259,18 @@ describe('SuperExpressive', () => {
     () => SuperExpressive().char('hello')
   );
 
+  testRegexEquality('controlChar', /\cM/, SuperExpressive().controlChar('m'));
+  testErrorConditition(
+    'controlChar: more than one',
+    'controlChar() can only be called with a single character from a-z (got aa)',
+    () => SuperExpressive().controlChar('aa')
+  );
+  testErrorConditition(
+    'controlChar: invalid character',
+    'controlChar() can only be called with a single character from a-z (got ~)',
+    () => SuperExpressive().controlChar('~')
+  );
+
   testRegexEquality('range', /[a-z]/, SuperExpressive().range('a', 'z'));
 });
 

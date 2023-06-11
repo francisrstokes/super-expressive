@@ -66,6 +66,7 @@
   - [.anythingButRange(a, b)](#anythingButRangea-b)
   - [.string(s)](#strings)
   - [.char(c)](#charc)
+  - [.controlChar(c)](#controlCharc)
   - [.range(a, b)](#rangea-b)
   - [.subexpression(expr, opts)](#subexpressionexpr-opts)
   - [.toRegexString()](#toRegexString)
@@ -858,6 +859,19 @@ SuperExpressive()
   .toRegex();
 // ->
 /x/
+```
+
+### .controlChar(c)
+
+Matches a control character using carat notation (`Ctrl^c`) where `c` is a single latin letter from A-Z.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .controlChar('J')
+  .toRegex();
+// ->
+/\cJ/
 ```
 
 ### .range(a, b)
