@@ -37,6 +37,7 @@ const replaceAll = (s, find, replace) => s.replace(new RegExp(`\\${find}`, 'g'),
 const escapeSpecial = s => specialChars.reduce((acc, char) => replaceAll(acc, char, `\\${char}`), s);
 
 const namedGroupRegex = /^[a-z]+\w*$/i;
+const singleUnicodeCharRegex = /^[^]$/u;
 
 const quantifierTable = {
   oneOrMore: '+',
@@ -449,14 +450,18 @@ class SuperExpressive {
     const strA = a.toString();
     const strB = b.toString();
 
-    assert(strA.length === 1, `a must be a single character or number (got ${strA})`);
-    assert(strB.length === 1, `b must be a single character or number (got ${strB})`);
-    assert(strA.charCodeAt(0) < strB.charCodeAt(0), `a must have a smaller character value than b (a = ${strA.charCodeAt(0)}, b = ${strB.charCodeAt(0)})`);
+    assert(singleUnicodeCharRegex.test(strA), `a must be a single character or number (got ${strA})`);
+    assert(singleUnicodeCharRegex.test(strB), `b must be a single character or number (got ${strB})`);
+    assert(strA.codePointAt(0) < strB.codePointAt(0), `a must have a smaller character value than b (a = ${strA.codePointAt(0)}, b = ${strB.codePointAt(0)})`);
 
     const next = this[clone]();
 
     const elementValue = t.range([strA, strB]);
     const currentFrame = next[getCurrentFrame]();
+
+    if (strA.length > 1 || strB.length > 1) {
+      next.state.flags.u = true;
+    }
 
     currentFrame.elements.push(next[applyQuantifier](elementValue));
 

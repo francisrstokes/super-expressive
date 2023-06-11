@@ -263,6 +263,7 @@ declare class SuperExpressive {
 
     /**
      * Matches any character that falls between `a` and `b`. Ordering is defined by a characters ASCII or unicode value.
+     * The `u` flag is automatically enabled if either `a` or `b` are unicode characters larger than 2 bytes.
      */
     range(a: string, b: string): SuperExpressive;
 

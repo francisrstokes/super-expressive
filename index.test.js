@@ -256,6 +256,23 @@ describe('SuperExpressive', () => {
   );
 
   testRegexEquality('range', /[a-z]/, SuperExpressive().range('a', 'z'));
+  testRegexEquality('range: unicode',/[a-z😀-😆]/u,
+    SuperExpressive()
+      .anyOf
+        .range('a','z')
+        .range('\u{1F600}', '\u{1F606}')
+      .end()
+  );
+  testErrorConditition(
+    'range: more than single characters',
+    'a must be a single character or number (got aa)',
+    () => SuperExpressive().range('aa','b')
+  );
+  testErrorConditition(
+    'range: more than single unicode character',
+    'b must be a single character or number (got ❤❤)',
+    () => SuperExpressive().range('a','❤❤')
+  );
 });
 
 describe('subexpressions', () => {
