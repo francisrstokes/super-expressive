@@ -288,6 +288,12 @@ declare class SuperExpressive {
     hexCode(hex: string): SuperExpressive;
 
     /**
+     * Matches a UTF-16 code unit with the code `hex`.
+     * @param hex A 4 digit hexadecimal string.
+     */
+    utf16Code(hex: string): SuperExpressive;
+
+    /**
      * Matches any character that falls between `a` and `b`. Ordering is defined by a characters ASCII or unicode value.
      */
     range(a: string, b: string): SuperExpressive;

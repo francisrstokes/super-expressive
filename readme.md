@@ -68,6 +68,7 @@
   - [.char(c)](#charc)
   - [.controlChar(c)](#controlCharc)
   - [.hexCode(hex)](#hexCodehex)
+  - [.utf16Code(hex)](#utf16Codehex)
   - [.range(a, b)](#rangea-b)
   - [.subexpression(expr, opts)](#subexpressionexpr-opts)
   - [.toRegexString()](#toRegexString)
@@ -886,6 +887,19 @@ SuperExpressive()
   .toRegex();
 // ->
 /\x2A/
+```
+
+### .utf16Code(hex)
+
+Matches a UTF-16 code unit with the code `hex`, where `hex` is a 4 digit hexadecimal string.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .utf16Code('002A')
+  .toRegex();
+// ->
+/\u002A/
 ```
 
 ### .range(a, b)

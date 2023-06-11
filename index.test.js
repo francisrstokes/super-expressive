@@ -283,6 +283,18 @@ describe('SuperExpressive', () => {
     () => SuperExpressive().hexCode('ak')
   );
 
+  testRegexEquality('utf16Code', /\u0021/, SuperExpressive().utf16Code('0021'));
+  testErrorConditition(
+    'utf16Code: only one digit',
+    'utf16Code() can only be called with a 4 character string (got a)',
+    () => SuperExpressive().utf16Code('a')
+  );
+  testErrorConditition(
+    'utf16Code: invalid characters',
+    'hex can only contain hexadecimal characters (got 0A2K)',
+    () => SuperExpressive().utf16Code('0A2K')
+  );
+
   testRegexEquality('range', /[a-z]/, SuperExpressive().range('a', 'z'));
 });
 
