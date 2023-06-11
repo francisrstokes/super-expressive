@@ -282,6 +282,12 @@ declare class SuperExpressive {
     controlChar(c: string): SuperExpressive;
 
     /**
+     * Matches a character with the code `hex`.
+     * @param hex A 2 digit hexadecimal string.
+     */
+    hexCode(hex: string): SuperExpressive;
+
+    /**
      * Matches any character that falls between `a` and `b`. Ordering is defined by a characters ASCII or unicode value.
      */
     range(a: string, b: string): SuperExpressive;

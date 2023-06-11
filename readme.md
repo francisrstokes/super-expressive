@@ -67,6 +67,7 @@
   - [.string(s)](#strings)
   - [.char(c)](#charc)
   - [.controlChar(c)](#controlCharc)
+  - [.hexCode(hex)](#hexCodehex)
   - [.range(a, b)](#rangea-b)
   - [.subexpression(expr, opts)](#subexpressionexpr-opts)
   - [.toRegexString()](#toRegexString)
@@ -872,6 +873,19 @@ SuperExpressive()
   .toRegex();
 // ->
 /\cJ/
+```
+
+### .hexCode(hex)
+
+Matches a character with the code `hex`, where `hex` is a 2 dogit hexadecimal string.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .hexCode('2A')
+  .toRegex();
+// ->
+/\x2A/
 ```
 
 ### .range(a, b)

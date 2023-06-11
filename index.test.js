@@ -271,6 +271,18 @@ describe('SuperExpressive', () => {
     () => SuperExpressive().controlChar('~')
   );
 
+  testRegexEquality('hexCode', /\x21/, SuperExpressive().hexCode('21'));
+  testErrorConditition(
+    'hexCode: only one digit',
+    'hexCode() can only be called with a 2 character string (got a)',
+    () => SuperExpressive().hexCode('a')
+  );
+  testErrorConditition(
+    'hexCode: invalid characters',
+    'hex can only contain hexadecimal characters (got ak)',
+    () => SuperExpressive().hexCode('ak')
+  );
+
   testRegexEquality('range', /[a-z]/, SuperExpressive().range('a', 'z'));
 });
 

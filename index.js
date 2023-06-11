@@ -38,6 +38,7 @@ const escapeSpecial = s => specialChars.reduce((acc, char) => replaceAll(acc, ch
 
 const namedGroupRegex = /^[a-z]+\w*$/i;
 const controlCharRegex = /^[a-z]$/i;
+const hexadecimalStringRegex = /^[0-9a-f]+$/i;
 
 const quantifierTable = {
   oneOrMore: '+',
@@ -93,6 +94,7 @@ const t = {
   range: asType('range', { classCompatible: true }),
   string: asType('string', { quantifierRequiresGroup: true }),
   controlChar: asType('controlChar', { classCompatible: true }),
+  hexCode: asType('hexCode', { classCompatible: true }),
   namedBackreference: name => deferredType('namedBackreference', { name }),
   backreference: index => deferredType('backreference', { index }),
   capture: deferredType('capture', { containsChildren: true }),
@@ -467,6 +469,18 @@ class SuperExpressive {
     return next;
   }
 
+  hexCode(hex) {
+    assert(typeof hex === 'string', `hex must be a string (got ${hex})`);
+    assert(hex.length === 2, `hexCode() can only be called with a 2 character string (got ${hex})`);
+    assert(hexadecimalStringRegex.test(hex), `hex can only contain hexadecimal characters (got ${hex})`);
+
+    const next = this[clone]();
+    const currentFrame = next[getCurrentFrame]();
+    currentFrame.elements.push(next[applyQuantifier](t.hexCode(hex)));
+
+    return next;
+  }
+
   range(a, b) {
     const strA = a.toString();
     const strB = b.toString();
@@ -678,6 +692,7 @@ class SuperExpressive {
       case 'string': return el.value;
       case 'char': return el.value;
       case 'controlChar': return `\\c${el.value}`;
+      case 'hexCode': return `\\x${el.value}`;
       case 'range': return `[${el.value[0]}-${el.value[1]}]`;
       case 'anythingButRange': return `[^${el.value[0]}-${el.value[1]}]`;
       case 'anyOfChars': return `[${el.value}]`;
