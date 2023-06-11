@@ -42,6 +42,10 @@ describe('SuperExpressive', () => {
   testRegexEquality('newline', /\n/, SuperExpressive().newline);
   testRegexEquality('carriageReturn', /\r/, SuperExpressive().carriageReturn);
   testRegexEquality('tab', /\t/, SuperExpressive().tab);
+  testRegexEquality('verticalTab', /\v/, SuperExpressive().verticalTab);
+  testRegexEquality('formFeed', /\f/, SuperExpressive().formFeed);
+  testRegexEquality('backspace', /[\b]/, SuperExpressive().backspace);
+  testRegexEquality('backspace fused', /[\b]/, SuperExpressive().anyOf.backspace.end());
   testRegexEquality('nullByte', /\0/, SuperExpressive().nullByte);
 
   testRegexEquality(

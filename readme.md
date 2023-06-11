@@ -34,6 +34,9 @@
   - [.newline](#newline)
   - [.carriageReturn](#carriageReturn)
   - [.tab](#tab)
+  - [.verticalTab](#verticalTab)
+  - [.formFeed](#formFeed)
+  - [.backspace](#backspace)
   - [.nullByte](#nullByte)
   - [.anyOf](#anyOf)
   - [.capture](#capture)
@@ -391,6 +394,45 @@ SuperExpressive()
   .toRegex();
 // ->
 /\t/
+```
+
+### .verticalTab
+
+Matches a `\v` character.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .verticalTab
+  .toRegex();
+// ->
+/\v/
+```
+
+### .formFeed
+
+Matches a `\f` character.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .formFeed
+  .toRegex();
+// ->
+/\f/
+```
+
+### .backspace
+
+Matches a `\b` character.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .backspace
+  .toRegex();
+// ->
+/[\b]/
 ```
 
 ### .nullByte

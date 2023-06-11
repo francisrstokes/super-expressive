@@ -113,6 +113,21 @@ declare class SuperExpressive {
     tab: SuperExpressive;
 
     /**
+     * Matches a `\v` character.
+     */
+    verticalTab: SuperExpressive;
+
+    /**
+     * Matches a `\f` character.
+     */
+    formFeed: SuperExpressive;
+
+    /**
+     * Matches a `\b` character.
+     */
+    backspace: SuperExpressive;
+
+    /**
      * Matches a `\u0000` character (ASCII `0`).
      */
     nullByte: SuperExpressive;

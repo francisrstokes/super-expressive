@@ -80,6 +80,9 @@ const t = {
   newline: asType('newline',{ classCompatible: true }) (),
   carriageReturn: asType('carriageReturn', { classCompatible: true }) (),
   tab: asType('tab', { classCompatible: true }) (),
+  verticalTab: asType('verticalTab', { classCompatible: true }) (),
+  formFeed: asType('formFeed', { classCompatible: true }) (),
+  backspace: asType('backspace', { classCompatible: true }) (),
   nullByte: asType('nullByte', { classCompatible: true }) (),
   anyOfChars: asType('anyOfChars', { classCompatible: true }),
   anythingButString: asType('anythingButString'),
@@ -118,10 +121,13 @@ const fuseElements = elements => {
   const fused = fusables.map(el => {
     if (el.type === 'char' || el.type === 'anyOfChars') {
       return el.value;
-    } else if (el.type !== 'range') {
-      return SuperExpressive[evaluate](el);
+    } else if (el.type === 'range') {
+      return `${el.value[0]}-${el.value[1]}`
+    } else if (el.type === 'backspace') {
+      return `\\b`;
     }
-    return `${el.value[0]}-${el.value[1]}`;
+
+    return SuperExpressive[evaluate](el);;
   }).join('');
   return [fused, rest];
 }
@@ -214,6 +220,9 @@ class SuperExpressive {
   get newline() { return this[matchElement](t.newline); }
   get carriageReturn() { return this[matchElement](t.carriageReturn); }
   get tab() { return this[matchElement](t.tab); }
+  get verticalTab() { return this[matchElement](t.verticalTab); }
+  get formFeed() { return this[matchElement](t.formFeed); }
+  get backspace() { return this[matchElement](t.backspace); }
   get nullByte() { return this[matchElement](t.nullByte); }
 
   namedBackreference(name) {
@@ -649,6 +658,9 @@ class SuperExpressive {
       case 'newline': return '\\n';
       case 'carriageReturn': return '\\r';
       case 'tab': return '\\t';
+      case 'verticalTab': return '\\v';
+      case 'formFeed': return '\\f';
+      case 'backspace': return '[\\b]';
       case 'nullByte': return '\\0';
       case 'string': return el.value;
       case 'char': return el.value;
