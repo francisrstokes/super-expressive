@@ -295,6 +295,48 @@ describe('SuperExpressive', () => {
     () => SuperExpressive().utf16Code('0A2K')
   );
 
+  testRegexEquality('unicodeCharCode', /\u{00021}/u, SuperExpressive().unicodeCharCode('00021'));
+  testErrorConditition(
+    'unicodeCharCode: only one digit',
+    'unicodeCharCode() can only be called with a 4 or 5 character string (got a)',
+    () => SuperExpressive().unicodeCharCode('a')
+  );
+  testErrorConditition(
+    'unicodeCharCode: invalid characters',
+    'hex can only contain hexadecimal characters (got 00A2K)',
+    () => SuperExpressive().unicodeCharCode('00A2K')
+  );
+
+  testRegexEquality('unicodeProperty', /\p{Script=Latin}/u, SuperExpressive().unicodeProperty('Script=Latin'));
+  testRegexEquality('unicodeProperty: lone property', /\p{L}/u, SuperExpressive().unicodeProperty('L'));
+  testErrorConditition(
+    'unicodeProperty: invalid characters',
+    `Property is not a valid Unicode property (got ~). ` +
+    `For valid properties see: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape`,
+    () => SuperExpressive().unicodeProperty('~')
+  );
+  testErrorConditition(
+    'unicodeProperty: invalid property name',
+    `Property is not a valid Unicode property (got nope). ` +
+    `For valid properties see: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape`,
+    () => SuperExpressive().unicodeProperty('nope')
+  );
+
+  testRegexEquality('notUnicodeProperty', /\P{Script=Latin}/u, SuperExpressive().notUnicodeProperty('Script=Latin'));
+  testRegexEquality('notUnicodeProperty: lone property', /\P{L}/u, SuperExpressive().notUnicodeProperty('L'));
+  testErrorConditition(
+    'notUnicodeProperty: invalid characters',
+    `Property is not a valid Unicode property (got ~). ` +
+    `For valid properties see: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape`,
+    () => SuperExpressive().notUnicodeProperty('~')
+  );
+  testErrorConditition(
+    'notUnicodeProperty: invalid property name',
+    `Property is not a valid Unicode property (got nope). ` +
+    `For valid properties see: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape`,
+    () => SuperExpressive().notUnicodeProperty('nope')
+  );
+
   testRegexEquality('range', /[a-z]/, SuperExpressive().range('a', 'z'));
 });
 

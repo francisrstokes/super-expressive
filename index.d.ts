@@ -294,6 +294,33 @@ declare class SuperExpressive {
     utf16Code(hex: string): SuperExpressive;
 
     /**
+     * Matches a unicode character with the value `hex`.
+     * Enables the unicode `u` flag when used.
+     * @param hex A 4 or 5 digit hexadecimal string.
+     */
+    unicodeCharCode(hex: string): SuperExpressive;
+
+    /**
+     * Matches a Unicode character with the given Unicode property.
+     * Invalid Unicode properties or values will cause .toRegex() to throw an error.
+     * Enables the unicode `u` flag when used.
+     * @param property A Unicode character property in the form `loneProperty` or `property=value`.
+     * For valid properties see the MDN Docs:
+     * https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape
+     */
+    unicodeProperty(property: string): SuperExpressive;
+
+    /**
+     * Matches a Unicode character without the given Unicode property.
+     * Invalid Unicode properties or values will cause .toRegex() to throw an error.
+     * Enables the unicode `u` flag when used.
+     * @param property A Unicode character property in the form `loneProperty` or `property=value`.
+     * For valid properties see the MDN Docs:
+     * https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape
+     */
+    notUnicodeProperty(property: string): SuperExpressive;
+
+    /**
      * Matches any character that falls between `a` and `b`. Ordering is defined by a characters ASCII or unicode value.
      */
     range(a: string, b: string): SuperExpressive;

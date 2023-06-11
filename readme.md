@@ -69,6 +69,9 @@
   - [.controlChar(c)](#controlCharc)
   - [.hexCode(hex)](#hexCodehex)
   - [.utf16Code(hex)](#utf16Codehex)
+  - [.unicodeCharCode(hex)](#unicodeCharCodehex)
+  - [.unicodeProperty(property)](#unicodePropertyproperty)
+  - [.notUnicodeProperty(property)](#notUnicodePropertyproperty)
   - [.range(a, b)](#rangea-b)
   - [.subexpression(expr, opts)](#subexpressionexpr-opts)
   - [.toRegexString()](#toRegexString)
@@ -900,6 +903,50 @@ SuperExpressive()
   .toRegex();
 // ->
 /\u002A/
+```
+
+### .unicodeCharCode(hex)
+
+Matches a Unicode character code with the value `hex`, where `hex` is a 4 or 5 digit hexadecimal string.
+Implicitly enables the `u` flag on the regular expression.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .unicodeCharCode('0002A')
+  .toRegex();
+// ->
+/\u{0002A}/u
+```
+
+### .unicodeProperty(property)
+
+Matches a Unicode character with the given Unicode property.
+See the [MDN Docs](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape) for valid properties.
+Implicitly enables the `u` flag on the regular expression.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .unicodeProperty('Script=Latin')
+  .toRegex();
+// ->
+/\p{Script=Latin}/u
+```
+
+### .notUnicodeProperty(property)
+
+Matches a Unicode character without the given Unicode property.
+See the [MDN Docs](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape) for valid properties.
+Implicitly enables the `u` flag on the regular expression.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .notUnicodeProperty('Script=Latin')
+  .toRegex();
+// ->
+/\P{Script=Latin}/u
 ```
 
 ### .range(a, b)

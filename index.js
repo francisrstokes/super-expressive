@@ -96,6 +96,9 @@ const t = {
   controlChar: asType('controlChar', { classCompatible: true }),
   hexCode: asType('hexCode', { classCompatible: true }),
   utf16Code: asType('utf16Code', { classCompatible: true }),
+  unicodeCharCode: asType('unicodeCharCode', { classCompatible: true }),
+  unicodeProperty: asType('unicodeProperty', { classCompatible: true }),
+  notUnicodeProperty: asType('notUnicodeProperty', { classCompatible: true }),
   namedBackreference: name => deferredType('namedBackreference', { name }),
   backreference: index => deferredType('backreference', { index }),
   capture: deferredType('capture', { containsChildren: true }),
@@ -494,6 +497,55 @@ class SuperExpressive {
     return next;
   }
 
+  unicodeCharCode(hex) {
+    assert(typeof hex === 'string', `hex must be a string (got ${hex})`);
+    assert(hex.length === 4 || hex.length === 5, `unicodeCharCode() can only be called with a 4 or 5 character string (got ${hex})`);
+    assert(hexadecimalStringRegex.test(hex), `hex can only contain hexadecimal characters (got ${hex})`);
+
+    const next = this[clone]();
+    const currentFrame = next[getCurrentFrame]();
+    next.state.flags.u = true;
+    currentFrame.elements.push(next[applyQuantifier](t.unicodeCharCode(hex)));
+
+    return next;
+  }
+
+  unicodeProperty(property) {
+    assert(typeof property === 'string', `property must be a string (got ${property})`);
+    try { RegExp(`\\p{${property}}`, 'u');
+    } catch {
+      throw new Error(
+        `Property is not a valid Unicode property (got ${property}). ` +
+        `For valid properties see: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape`
+      );
+    }
+
+    const next = this[clone]();
+    const currentFrame = next[getCurrentFrame]();
+    next.state.flags.u = true;
+    currentFrame.elements.push(next[applyQuantifier](t.unicodeProperty(property)));
+
+    return next;
+  }
+
+  notUnicodeProperty(property) {
+    assert(typeof property === 'string', `property must be a string (got ${property})`);
+    try { RegExp(`\\P{${property}}`, 'u');
+    } catch {
+      throw new Error(
+        `Property is not a valid Unicode property (got ${property}). ` +
+        `For valid properties see: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape`
+      );
+    }
+
+    const next = this[clone]();
+    const currentFrame = next[getCurrentFrame]();
+    next.state.flags.u = true;
+    currentFrame.elements.push(next[applyQuantifier](t.notUnicodeProperty(property)));
+
+    return next;
+  }
+
   range(a, b) {
     const strA = a.toString();
     const strB = b.toString();
@@ -707,6 +759,9 @@ class SuperExpressive {
       case 'controlChar': return `\\c${el.value}`;
       case 'hexCode': return `\\x${el.value}`;
       case 'utf16Code': return `\\u${el.value}`;
+      case 'unicodeCharCode': return `\\u{${el.value}}`;
+      case 'unicodeProperty': return `\\p{${el.value}}`;
+      case 'notUnicodeProperty': return `\\P{${el.value}}`;
       case 'range': return `[${el.value[0]}-${el.value[1]}]`;
       case 'anythingButRange': return `[^${el.value[0]}-${el.value[1]}]`;
       case 'anyOfChars': return `[${el.value}]`;
