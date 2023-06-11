@@ -85,6 +85,7 @@ const t = {
   anythingButString: asType('anythingButString'),
   anythingButChars: asType('anythingButChars'),
   anythingButRange: asType('anythingButRange'),
+  anythingBut: deferredType('anythingBut', { containsChildren: true }),
   char: asType('char', { classCompatible: true }),
   range: asType('range', { classCompatible: true }),
   string: asType('string', { quantifierRequiresGroup: true }),
@@ -241,6 +242,7 @@ class SuperExpressive {
     return next;
   }
 
+  get anythingBut() { return this[frameCreatingElement](t.anythingBut); }
   get anyOf() { return this[frameCreatingElement](t.anyOf); }
   get group() { return this[frameCreatingElement](t.group); }
   get assertAhead() { return this[frameCreatingElement](t.assertAhead); }
@@ -707,6 +709,17 @@ class SuperExpressive {
       case 'assertNotBehind': {
         const evaluated = el.value.map(SuperExpressive[evaluate]).join('');
         return `(?<!${evaluated})`;
+      }
+
+      case 'anythingBut': {
+        const [fused, rest] = fuseElements(el.value);
+
+        if (!rest.length) {
+          return `[^${fused}]`;
+        }
+
+        const evaluatedRest = rest.map(SuperExpressive[evaluate]);
+        return `(?:(?!${evaluatedRest.join('|')})[^${fused}])`;
       }
 
       case 'anyOf': {
