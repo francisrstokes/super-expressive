@@ -69,24 +69,24 @@ const t = {
   startOfInput: asType('startOfInput') (),
   endOfInput: asType('endOfInput') (),
   anyChar: asType('anyChar') (),
-  whitespaceChar: asType('whitespaceChar') (),
-  nonWhitespaceChar: asType('nonWhitespaceChar') (),
-  digit: asType('digit') (),
-  nonDigit: asType('nonDigit') (),
-  word: asType('word') (),
-  nonWord: asType('nonWord') (),
+  whitespaceChar: asType('whitespaceChar', { classCompatible: true }) (),
+  nonWhitespaceChar: asType('nonWhitespaceChar', { classCompatible: true }) (),
+  digit: asType('digit', { classCompatible: true }) (),
+  nonDigit: asType('nonDigit', { classCompatible: true }) (),
+  word: asType('word', { classCompatible: true }) (),
+  nonWord: asType('nonWord', { classCompatible: true }) (),
   wordBoundary: asType('wordBoundary') (),
   nonWordBoundary: asType('nonWordBoundary') (),
-  newline: asType('newline') (),
-  carriageReturn: asType('carriageReturn') (),
-  tab: asType('tab') (),
-  nullByte: asType('nullByte') (),
-  anyOfChars: asType('anyOfChars'),
+  newline: asType('newline',{ classCompatible: true }) (),
+  carriageReturn: asType('carriageReturn', { classCompatible: true }) (),
+  tab: asType('tab', { classCompatible: true }) (),
+  nullByte: asType('nullByte', { classCompatible: true }) (),
+  anyOfChars: asType('anyOfChars', { classCompatible: true }),
   anythingButString: asType('anythingButString'),
   anythingButChars: asType('anythingButChars'),
   anythingButRange: asType('anythingButRange'),
-  char: asType('char'),
-  range: asType('range'),
+  char: asType('char', { classCompatible: true }),
+  range: asType('range', { classCompatible: true }),
   string: asType('string', { quantifierRequiresGroup: true }),
   namedBackreference: name => deferredType('namedBackreference', { name }),
   backreference: index => deferredType('backreference', { index }),
@@ -111,15 +111,15 @@ const t = {
 }
 
 const isFusable = element => {
-  return element.type === 'range' ||
-    element.type === 'char' ||
-    element.type === 'anyOfChars';
+  return element.classCompatible;
 };
 const fuseElements = elements => {
   const [fusables, rest] = partition(isFusable, elements);
   const fused = fusables.map(el => {
     if (el.type === 'char' || el.type === 'anyOfChars') {
       return el.value;
+    } else if (el.type !== 'range') {
+      return SuperExpressive[evaluate](el);
     }
     return `${el.value[0]}-${el.value[1]}`;
   }).join('');
