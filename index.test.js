@@ -42,6 +42,10 @@ describe('SuperExpressive', () => {
   testRegexEquality('newline', /\n/, SuperExpressive().newline);
   testRegexEquality('carriageReturn', /\r/, SuperExpressive().carriageReturn);
   testRegexEquality('tab', /\t/, SuperExpressive().tab);
+  testRegexEquality('verticalTab', /\v/, SuperExpressive().verticalTab);
+  testRegexEquality('formFeed', /\f/, SuperExpressive().formFeed);
+  testRegexEquality('backspace', /[\b]/, SuperExpressive().backspace);
+  testRegexEquality('backspace fused', /[\b]/, SuperExpressive().anyOf.backspace.end());
   testRegexEquality('nullByte', /\0/, SuperExpressive().nullByte);
 
   testRegexEquality(
@@ -305,6 +309,84 @@ describe('SuperExpressive', () => {
     'char: more than one',
     'char() can only be called with a single character (got hello)',
     () => SuperExpressive().char('hello')
+  );
+
+  testRegexEquality('controlChar', /\cM/, SuperExpressive().controlChar('m'));
+  testErrorConditition(
+    'controlChar: more than one',
+    'controlChar() can only be called with a single character from a-z (got aa)',
+    () => SuperExpressive().controlChar('aa')
+  );
+  testErrorConditition(
+    'controlChar: invalid character',
+    'controlChar() can only be called with a single character from a-z (got ~)',
+    () => SuperExpressive().controlChar('~')
+  );
+
+  testRegexEquality('hexCode', /\x21/, SuperExpressive().hexCode('21'));
+  testErrorConditition(
+    'hexCode: only one digit',
+    'hexCode() can only be called with a 2 character string (got a)',
+    () => SuperExpressive().hexCode('a')
+  );
+  testErrorConditition(
+    'hexCode: invalid characters',
+    'hex can only contain hexadecimal characters (got ak)',
+    () => SuperExpressive().hexCode('ak')
+  );
+
+  testRegexEquality('utf16Code', /\u0021/, SuperExpressive().utf16Code('0021'));
+  testErrorConditition(
+    'utf16Code: only one digit',
+    'utf16Code() can only be called with a 4 character string (got a)',
+    () => SuperExpressive().utf16Code('a')
+  );
+  testErrorConditition(
+    'utf16Code: invalid characters',
+    'hex can only contain hexadecimal characters (got 0A2K)',
+    () => SuperExpressive().utf16Code('0A2K')
+  );
+
+  testRegexEquality('unicodeCharCode', /\u{00021}/u, SuperExpressive().unicodeCharCode('00021'));
+  testErrorConditition(
+    'unicodeCharCode: only one digit',
+    'unicodeCharCode() can only be called with a 4 or 5 character string (got a)',
+    () => SuperExpressive().unicodeCharCode('a')
+  );
+  testErrorConditition(
+    'unicodeCharCode: invalid characters',
+    'hex can only contain hexadecimal characters (got 00A2K)',
+    () => SuperExpressive().unicodeCharCode('00A2K')
+  );
+
+  testRegexEquality('unicodeProperty', /\p{Script=Latin}/u, SuperExpressive().unicodeProperty('Script=Latin'));
+  testRegexEquality('unicodeProperty: lone property', /\p{L}/u, SuperExpressive().unicodeProperty('L'));
+  testErrorConditition(
+    'unicodeProperty: invalid characters',
+    `Property is not a valid Unicode property (got ~). ` +
+    `For valid properties see: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape`,
+    () => SuperExpressive().unicodeProperty('~')
+  );
+  testErrorConditition(
+    'unicodeProperty: invalid property name',
+    `Property is not a valid Unicode property (got nope). ` +
+    `For valid properties see: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape`,
+    () => SuperExpressive().unicodeProperty('nope')
+  );
+
+  testRegexEquality('notUnicodeProperty', /\P{Script=Latin}/u, SuperExpressive().notUnicodeProperty('Script=Latin'));
+  testRegexEquality('notUnicodeProperty: lone property', /\P{L}/u, SuperExpressive().notUnicodeProperty('L'));
+  testErrorConditition(
+    'notUnicodeProperty: invalid characters',
+    `Property is not a valid Unicode property (got ~). ` +
+    `For valid properties see: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape`,
+    () => SuperExpressive().notUnicodeProperty('~')
+  );
+  testErrorConditition(
+    'notUnicodeProperty: invalid property name',
+    `Property is not a valid Unicode property (got nope). ` +
+    `For valid properties see: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape`,
+    () => SuperExpressive().notUnicodeProperty('nope')
   );
 
   testRegexEquality('range', /[a-z]/, SuperExpressive().range('a', 'z'));

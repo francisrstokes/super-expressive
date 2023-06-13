@@ -113,6 +113,21 @@ declare class SuperExpressive {
     tab: SuperExpressive;
 
     /**
+     * Matches a `\v` character.
+     */
+    verticalTab: SuperExpressive;
+
+    /**
+     * Matches a `\f` character.
+     */
+    formFeed: SuperExpressive;
+
+    /**
+     * Matches a `\b` character.
+     */
+    backspace: SuperExpressive;
+
+    /**
      * Matches a `\u0000` character (ASCII `0`).
      */
     nullByte: SuperExpressive;
@@ -265,6 +280,50 @@ declare class SuperExpressive {
      * Matches the exact character `c`.
      */
     char(c: string): SuperExpressive;
+
+    /**
+     * Matches a control code for the latin character `c`.
+     */
+    controlChar(c: string): SuperExpressive;
+
+    /**
+     * Matches a character with the code `hex`.
+     * @param hex A 2 digit hexadecimal string.
+     */
+    hexCode(hex: string): SuperExpressive;
+
+    /**
+     * Matches a UTF-16 code unit with the code `hex`.
+     * @param hex A 4 digit hexadecimal string.
+     */
+    utf16Code(hex: string): SuperExpressive;
+
+    /**
+     * Matches a unicode character with the value `hex`.
+     * Enables the unicode `u` flag when used.
+     * @param hex A 4 or 5 digit hexadecimal string.
+     */
+    unicodeCharCode(hex: string): SuperExpressive;
+
+    /**
+     * Matches a Unicode character with the given Unicode property.
+     * Invalid Unicode properties or values will cause .toRegex() to throw an error.
+     * Enables the unicode `u` flag when used.
+     * @param property A Unicode character property in the form `loneProperty` or `property=value`.
+     * For valid properties see the MDN Docs:
+     * https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape
+     */
+    unicodeProperty(property: string): SuperExpressive;
+
+    /**
+     * Matches a Unicode character without the given Unicode property.
+     * Invalid Unicode properties or values will cause .toRegex() to throw an error.
+     * Enables the unicode `u` flag when used.
+     * @param property A Unicode character property in the form `loneProperty` or `property=value`.
+     * For valid properties see the MDN Docs:
+     * https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape
+     */
+    notUnicodeProperty(property: string): SuperExpressive;
 
     /**
      * Matches any character that falls between `a` and `b`. Ordering is defined by a characters ASCII or unicode value.
