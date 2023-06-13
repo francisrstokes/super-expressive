@@ -970,14 +970,16 @@ SuperExpressive()
 ### .range(a, b)
 
 Matches any character that falls between `a` and `b`. Ordering is defined by a characters ASCII or unicode value.
+The `u` flag is automatically enabled if either `a` or `b` are unicode characters larger than 2 bytes.
 
 **Example**
 ```JavaScript
 SuperExpressive()
   .range('a', 'z')
+  .range('\u{1F600}', '\u{1F606}')
   .toRegex();
 // ->
-/[a-z]/
+/[a-z][😀-😆]/u
 ```
 
 ### .subexpression(expr, opts?)
