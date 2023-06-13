@@ -58,6 +58,7 @@
   - [.startOfInput](#startOfInput)
   - [.endOfInput](#endOfInput)
   - [.anyOfChars(chars)](#anyOfCharschars)
+  - [.anythingBut](#anythingBut)
   - [.anythingButChars(chars)](#anythingButCharschars)
   - [.anythingButString(str)](#anythingButStringstr)
   - [.anythingButRange(a, b)](#anythingButRangea-b)
@@ -751,6 +752,23 @@ SuperExpressive()
   .toRegex();
 // ->
 /[aeiou]/
+```
+
+### .anythingBut
+
+Matches any character, except those that match any of the specified elements. Needs to be finalised with `.end()`.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .anythingBut
+    .digit
+    .range('a','z')
+    .string('XXX')
+  .end()
+  .toRegex();
+// ->
+/(?:(?!XXX)[^\da-z])/
 ```
 
 ### .anythingButChars(chars)

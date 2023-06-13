@@ -123,6 +123,11 @@ declare class SuperExpressive {
     anyOf: SuperExpressive;
 
     /**
+     * Matches a character that doesn't match any of the specified elements. Needs to be finalised with `.end()`.
+     */
+    anythingBut: SuperExpressive;
+
+    /**
      * Creates a capture group for the proceeding elements. Needs to be finalised with `.end()`.
      */
     capture: SuperExpressive;

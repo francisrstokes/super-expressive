@@ -85,6 +85,58 @@ describe('SuperExpressive', () => {
   );
 
   testRegexEquality(
+    'anythingBut: basic',
+    /(?:(?!hello)[^\d\w\.#])/,
+    SuperExpressive()
+      .anythingBut
+        .string('hello')
+        .digit
+        .word
+        .char('.')
+        .char('#')
+      .end()
+  );
+
+  testRegexEquality(
+    'anythingBut: range fusion',
+    /[^a-zA-Z0-9\.#]/,
+    SuperExpressive()
+      .anythingBut
+        .range('a', 'z')
+        .range('A', 'Z')
+        .range('0', '9')
+        .char('.')
+        .char('#')
+      .end()
+  );
+
+  testRegexEquality(
+    'anythingBut: range fusion with other choices',
+    /(?:(?!XXX)[^a-zA-Z0-9\.#])/,
+    SuperExpressive()
+      .anythingBut
+        .range('a', 'z')
+        .range('A', 'Z')
+        .range('0', '9')
+        .char('.')
+        .char('#')
+        .string('XXX')
+      .end()
+  );
+
+  testRegexEquality(
+    'anythingBut: only non-fusion choices',
+    /(?:(?!XXX|(\d))[^])/,
+    SuperExpressive()
+      .anythingBut
+        .string('XXX')
+        .capture
+          .digit
+        .end()
+      .end()
+  );
+
+  testRegexEquality(
     'capture',
     /(hello \w!)/,
     SuperExpressive()
