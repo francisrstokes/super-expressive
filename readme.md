@@ -34,6 +34,9 @@
   - [.newline](#newline)
   - [.carriageReturn](#carriageReturn)
   - [.tab](#tab)
+  - [.verticalTab](#verticalTab)
+  - [.formFeed](#formFeed)
+  - [.backspace](#backspace)
   - [.nullByte](#nullByte)
   - [.anyOf](#anyOf)
   - [.capture](#capture)
@@ -58,11 +61,18 @@
   - [.startOfInput](#startOfInput)
   - [.endOfInput](#endOfInput)
   - [.anyOfChars(chars)](#anyOfCharschars)
+  - [.anythingBut](#anythingBut)
   - [.anythingButChars(chars)](#anythingButCharschars)
   - [.anythingButString(str)](#anythingButStringstr)
   - [.anythingButRange(a, b)](#anythingButRangea-b)
   - [.string(s)](#strings)
   - [.char(c)](#charc)
+  - [.controlChar(c)](#controlCharc)
+  - [.hexCode(hex)](#hexCodehex)
+  - [.utf16Code(hex)](#utf16Codehex)
+  - [.unicodeCharCode(hex)](#unicodeCharCodehex)
+  - [.unicodeProperty(property)](#unicodePropertyproperty)
+  - [.notUnicodeProperty(property)](#notUnicodePropertyproperty)
   - [.range(a, b)](#rangea-b)
   - [.subexpression(expr, opts)](#subexpressionexpr-opts)
   - [.toRegexString()](#toRegexString)
@@ -391,6 +401,45 @@ SuperExpressive()
   .toRegex();
 // ->
 /\t/
+```
+
+### .verticalTab
+
+Matches a `\v` character.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .verticalTab
+  .toRegex();
+// ->
+/\v/
+```
+
+### .formFeed
+
+Matches a `\f` character.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .formFeed
+  .toRegex();
+// ->
+/\f/
+```
+
+### .backspace
+
+Matches a `\b` character.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .backspace
+  .toRegex();
+// ->
+/[\b]/
 ```
 
 ### .nullByte
@@ -753,6 +802,23 @@ SuperExpressive()
 /[aeiou]/
 ```
 
+### .anythingBut
+
+Matches any character, except those that match any of the specified elements. Needs to be finalised with `.end()`.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .anythingBut
+    .digit
+    .range('a','z')
+    .string('XXX')
+  .end()
+  .toRegex();
+// ->
+/(?:(?!XXX)[^\da-z])/
+```
+
 ### .anythingButChars(chars)
 
 Matches any character, except any of those in the provided string `chars`.
@@ -816,6 +882,89 @@ SuperExpressive()
   .toRegex();
 // ->
 /x/
+```
+
+### .controlChar(c)
+
+Matches a control character using carat notation (`Ctrl^c`) where `c` is a single latin letter from A-Z.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .controlChar('J')
+  .toRegex();
+// ->
+/\cJ/
+```
+
+### .hexCode(hex)
+
+Matches a character with the code `hex`, where `hex` is a 2 dogit hexadecimal string.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .hexCode('2A')
+  .toRegex();
+// ->
+/\x2A/
+```
+
+### .utf16Code(hex)
+
+Matches a UTF-16 code unit with the code `hex`, where `hex` is a 4 digit hexadecimal string.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .utf16Code('002A')
+  .toRegex();
+// ->
+/\u002A/
+```
+
+### .unicodeCharCode(hex)
+
+Matches a Unicode character code with the value `hex`, where `hex` is a 4 or 5 digit hexadecimal string.
+Implicitly enables the `u` flag on the regular expression.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .unicodeCharCode('0002A')
+  .toRegex();
+// ->
+/\u{0002A}/u
+```
+
+### .unicodeProperty(property)
+
+Matches a Unicode character with the given Unicode property.
+See the [MDN Docs](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape) for valid properties.
+Implicitly enables the `u` flag on the regular expression.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .unicodeProperty('Script=Latin')
+  .toRegex();
+// ->
+/\p{Script=Latin}/u
+```
+
+### .notUnicodeProperty(property)
+
+Matches a Unicode character without the given Unicode property.
+See the [MDN Docs](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Regular_expressions/Unicode_character_class_escape) for valid properties.
+Implicitly enables the `u` flag on the regular expression.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .notUnicodeProperty('Script=Latin')
+  .toRegex();
+// ->
+/\P{Script=Latin}/u
 ```
 
 ### .range(a, b)
