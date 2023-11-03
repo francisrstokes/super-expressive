@@ -132,7 +132,7 @@ const myRegex = SuperExpressive()
 
 ## Playground
 
-You can experiment with `SuperExpressive` in the [Super Expressive Playground](https://sepg.netlify.app/) by [@nartc](https://github.com/nartc). This is a great way to build a regex description, and test it against various inputs.
+You can experiment with `SuperExpressive` in the [Super Expressive Playground](https://nartc.github.io/ng-super-expressive/) by [@nartc](https://github.com/nartc). This is a great way to build a regex description, and test it against various inputs.
 
 <img src="playground-small.jpg">
 
