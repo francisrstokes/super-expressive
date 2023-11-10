@@ -232,6 +232,11 @@ declare class SuperExpressive {
     atLeast(n: number): SuperExpressive;
 
     /**
+     * Assert that the proceeding element will be matched at least `n` times, but as few times as possible.
+     */
+    atLeastLazy(n: number): SuperExpressive;
+
+    /**
      * Assert that the proceeding element will be matched somewhere between `x` and `y` times.
      */
     between(x: number, y: number): SuperExpressive;

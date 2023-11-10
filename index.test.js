@@ -289,6 +289,7 @@ describe('SuperExpressive', () => {
   testRegexEquality('oneOrMoreLazy', /\w+?/, SuperExpressive().oneOrMoreLazy.word);
   testRegexEquality('exactly', /\w{4}/, SuperExpressive().exactly(4).word);
   testRegexEquality('atLeast', /\w{4,}/, SuperExpressive().atLeast(4).word);
+  testRegexEquality('atLeastLazy', /\w{4,}?/, SuperExpressive().atLeastLazy(4).word);
   testRegexEquality('between', /\w{4,7}/, SuperExpressive().between(4, 7).word);
   testRegexEquality('betweenLazy', /\w{4,7}?/, SuperExpressive().betweenLazy(4, 7).word);
 
