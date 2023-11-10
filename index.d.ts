@@ -38,6 +38,11 @@ declare class SuperExpressive {
     caseInsensitive: SuperExpressive;
 
     /**
+     * Uses the `d` flag on the regular expression, which indicates that it should generate indices for the start and end of each capture group.
+     */
+    generateIndices: SuperExpressive;
+
+    /**
      * Uses the `y` flag on the regular expression, which indicates that it should create a stateful regular expression that can be resumed from the last match.
      */
     sticky: SuperExpressive;

@@ -26,6 +26,7 @@ describe('SuperExpressive', () => {
   testRegexEquality('Flag: g', /(?:)/g, SuperExpressive().allowMultipleMatches );
   testRegexEquality('Flag: m', /(?:)/m, SuperExpressive().lineByLine );
   testRegexEquality('Flag: i', /(?:)/i, SuperExpressive().caseInsensitive );
+  testRegexEquality('Flag: d', /(?:)/d, SuperExpressive().generateIndices );
   testRegexEquality('Flag: y', /(?:)/y, SuperExpressive().sticky);
   testRegexEquality('Flag: u', /(?:)/u, SuperExpressive().unicode);
   testRegexEquality('Flag: s', /(?:)/s, SuperExpressive().singleLine);

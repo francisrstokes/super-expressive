@@ -19,6 +19,7 @@
   - [.allowMultipleMatches](#allowMultipleMatches)
   - [.lineByLine](#lineByLine)
   - [.caseInsensitive](#caseInsensitive)
+  - [.generateIndices](#generateIndices)
   - [.sticky](#sticky)
   - [.unicode](#unicode)
   - [.singleLine](#singleLine)
@@ -200,6 +201,20 @@ SuperExpressive()
   .toRegex();
 // ->
 /HELLO/i
+```
+
+### .generateIndices
+
+Uses the `d` flag on the regular expression, which indicates that it should generate indices for the start and end of each capture group.
+
+**Example**
+```JavaScript
+SuperExpressive()
+  .generateIndices
+  .string('hello')
+  .toRegex();
+// ->
+/hello/d
 ```
 
 ### .sticky
