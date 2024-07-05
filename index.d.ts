@@ -269,7 +269,7 @@ declare class SuperExpressive {
     /**
      * Matches any character, except those that would be captured by the `.range` specified by `a` and `b`.
      */
-    anythingButRange(a: number, b: number): SuperExpressive;
+    anythingButRange(a: string, b: string): SuperExpressive;
 
     /**
      * Matches the exact string `s`.
