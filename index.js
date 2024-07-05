@@ -165,6 +165,7 @@ class SuperExpressive {
       hasDefinedStart: false,
       hasDefinedEnd: false,
       flags: {
+        d: false,
         g: false,
         y: false,
         m: false,
@@ -193,6 +194,12 @@ class SuperExpressive {
   get caseInsensitive() {
     const next = this[clone]();
     next.state.flags.i = true;
+    return next;
+  }
+
+  get generateIndices() {
+    const next = this[clone]();
+    next.state.flags.d = true;
     return next;
   }
 
