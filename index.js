@@ -49,6 +49,7 @@ const quantifierTable = {
   optional: '?',
   exactly: times => `{${times}}`,
   atLeast: times => `{${times},}`,
+  atLeastLazy: times => `{${times},}?`,
   between: times => `{${times[0]},${times[1]}}`,
   betweenLazy: times => `{${times[0]},${times[1]}}?`,
 }
@@ -114,6 +115,7 @@ const t = {
   assertNotBehind: deferredType('assertNotBehind', { containsChildren: true }),
   exactly: times => deferredType('exactly', { times, containsChild: true }),
   atLeast: times => deferredType('atLeast', { times, containsChild: true }),
+  atLeastLazy: times => deferredType('atLeastLazy', { times, containsChild: true }),
   between: (x, y) => deferredType('between', { times: [x, y], containsChild: true }),
   betweenLazy: (x, y) => deferredType('betweenLazy', { times: [x, y], containsChild: true }),
   zeroOrMore: deferredType('zeroOrMore', { containsChild: true }),
@@ -331,6 +333,18 @@ class SuperExpressive {
       throw new Error(`cannot quantify regular expression with "atLeast" because it's already being quantified with "${currentFrame.quantifier.type}"`);
     }
     currentFrame.quantifier = t.atLeast(n);
+    return next;
+  }
+
+  atLeastLazy(n) {
+    assert(Number.isInteger(n) && n > 0, `n must be a positive integer (got ${n})`);
+
+    const next = this[clone]();
+    const currentFrame = next[getCurrentFrame]();
+    if (currentFrame.quantifier) {
+      throw new Error(`cannot quantify regular expression with "atLeastLazy" because it's already being quantified with "${currentFrame.quantifier.type}"`);
+    }
+    currentFrame.quantifier = t.atLeastLazy(n);
     return next;
   }
 
@@ -793,6 +807,7 @@ class SuperExpressive {
       case 'betweenLazy':
       case 'between':
       case 'atLeast':
+      case 'atLeastLazy':
       case 'exactly': {
         const inner = SuperExpressive[evaluate](el.value);
         const withGroup = el.value.quantifierRequiresGroup
